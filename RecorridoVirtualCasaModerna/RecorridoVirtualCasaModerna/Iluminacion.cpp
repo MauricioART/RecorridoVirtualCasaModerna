@@ -11,6 +11,7 @@ Cambios en el shader, en lugar de enviar la textura en el shader de fragmentos, 
 #include <cmath>
 #include <vector>
 #include <math.h>
+#include <time.h>
 
 #include <glew.h>
 #include <glfw3.h>
@@ -53,16 +54,19 @@ Texture pisoTexture;
 Texture Tagave;
 Texture Kitt_T;
 Texture Luces;
+Texture BoteBas_T;
 
 
 Model Kitt_M;
 Model Llanta_M;
 Model Camino_M;
 Model Blackhawk_M;
+Model Lampara;
+Model BoteBasura;
+Model Arboles;
 
 
-
-Skybox skybox;
+Skybox skybox[11];
 
 //materiales
 Material Material_brillante;
@@ -296,6 +300,8 @@ int main()
 	Kitt_T.LoadTextureA();
 	Luces = Texture("Textures/Luces.tga");
 	Luces.LoadTextureA();
+	BoteBas_T = Texture("Texture/Trash_TrashTexture_BaseColor.png");
+	BoteBas_T.LoadTextureA();
 
 	// INICIALIZACIÓN DE MODELOS
 	Kitt_M = Model();
@@ -305,18 +311,55 @@ int main()
 	Blackhawk_M = Model();
 	Blackhawk_M.LoadModel("Models/uh60.obj");
 	Camino_M = Model();
-	Camino_M.LoadModel("Models/railroad track.obj");
+	Camino_M.LoadModel("Models/railroad track.obj");/*
+	Lampara = Model();
+	Lampara.LoadModel("Models/LamparaCalle.obj");
+	BoteBasura = Model();
+	BoteBasura.LoadModel("Models/gv arbage-can-bin.obj");
+	Arboles = Model();
+	Arboles.LoadModel("Models/Grass.obj");*/
 
+
+	std::string skyboxPath = "Textures/Skybox/";
+	std::string skyboxPathBuf = "Textures/Skybox/";
 
 	std::vector<std::string> skyboxFaces;
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_dn.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_up.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_bk.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
+	Shader* skyShader = new Shader();
+	skyShader->CreateFromFiles("shaders/skybox.vert", "shaders/skybox.frag");
 
-	skybox = Skybox(skyboxFaces);
+	//skyboxFaces.push_back(skyboxPath.append("Right").append(std::to_string(8)).append(".jpg"));
+	//skyboxPath = skyboxPathBuf;
+	//skyboxFaces.push_back(skyboxPath.append("Left").append(std::to_string(8)).append(".jpg"));
+	//skyboxPath = skyboxPathBuf;
+	//skyboxFaces.push_back(skyboxPath.append("Bottom").append(std::to_string(8)).append(".jpg"));
+	//skyboxPath = skyboxPathBuf;
+	//skyboxFaces.push_back(skyboxPath.append("Top").append(std::to_string(8)).append(".jpg"));
+	//skyboxPath = skyboxPathBuf;
+	//skyboxFaces.push_back(skyboxPath.append("Front").append(std::to_string(8)).append(".jpg"));
+	//skyboxPath = skyboxPathBuf;
+	//skyboxFaces.push_back(skyboxPath.append("Back").append(std::to_string(8)).append(".jpg"));
+	//skyboxPath = skyboxPathBuf;
+	//skybox[0] = Skybox(skyboxFaces,skyShader);
+
+	for (int i = 0; i < 11; i++) {
+
+		skyboxFaces.push_back(skyboxPath.append("Right").append(std::to_string(i)).append(".jpg"));
+		skyboxPath = skyboxPathBuf;
+		skyboxFaces.push_back(skyboxPath.append("Left").append(std::to_string(i)).append(".jpg"));
+		skyboxPath = skyboxPathBuf;
+		skyboxFaces.push_back(skyboxPath.append("Bottom").append(std::to_string(i)).append(".jpg"));
+		skyboxPath = skyboxPathBuf;
+		skyboxFaces.push_back(skyboxPath.append("Top").append(std::to_string(i)).append(".jpg"));
+		skyboxPath = skyboxPathBuf;
+		skyboxFaces.push_back(skyboxPath.append("Front").append(std::to_string(i)).append(".jpg"));
+		skyboxPath = skyboxPathBuf;
+		skyboxFaces.push_back(skyboxPath.append("Back").append(std::to_string(i)).append(".jpg"));
+		skyboxPath = skyboxPathBuf;
+		skybox[i] = Skybox(skyboxFaces,skyShader);
+		skyboxFaces.clear();
+	}
+
+	
 
 	// INICIALIZACIÓN MATERIALES
 	Material_brillante = Material(4.0f, 256);
@@ -339,7 +382,7 @@ int main()
 
 	//luz direccional, sólo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.1f, 0.1f,
+		0.5f, 0.3f,
 		0.0f, 0.0f, -1.0f);
 	//contador de luces puntuales
 	unsigned int pointLightCount = 0;
@@ -396,14 +439,44 @@ int main()
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 300.0f);
 
 
+	int hora = 0;
+	double paso = 3;
+	float t=0.0;
+	bool f1 = 1,f2 = 1;
+
+
+	
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
+
 		GLfloat now = glfwGetTime();
 		deltaTime = now - lastTime;
 		deltaTime += (now - lastTime) / limitFPS;
 		lastTime = now;
 
+		if (f1) {
+			t = 0.0;
+			f1 = 0;
+		}
+		t += 0.01;
+		if (f2) {
+			if (t > paso) {
+				hora++;
+				f1 = 1;
+			}
+			if (hora > 9)
+				f2 = 0;
+		}
+		else {
+			if (t > paso) {
+				hora--;
+				f1 = 1;
+			}
+			if (hora < 1)
+				f2 = 1;
+		}
+		printf("Hora: %i\n", hora);
 		//Recibir eventos del usuario
 		glfwPollEvents();
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
@@ -412,7 +485,7 @@ int main()
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+		skybox[hora].DrawSkybox(camera.calculateViewMatrix(), projection);
 		shaderList[0].UseShader();
 		uniformModel = shaderList[0].GetModelLocation();
 		uniformProjection = shaderList[0].GetProjectionLocation();
@@ -499,6 +572,14 @@ int main()
 		Llanta_M.RenderModel();		
 		
 	
+		//model = glm::mat4(1.0);/*
+		//model = glm::translate(model, glm::vec3(10.0f, 5.0f , 10.0f));*/
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		////agregar material al helicóptero
+		//Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		//BoteBasura.RenderModel();
+
+
 		//agregar incremento en X con teclado
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(-20.0f + mainWindow.getBHx(), 30.0f + mainWindow.getBHy(), -1.0));
