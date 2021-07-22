@@ -30,7 +30,7 @@ Cambios en el shader, en lugar de enviar la textura en el shader de fragmentos, 
 #include "Sphere.h"
 #include"Model.h"
 #include "Skybox.h"
-
+#include "AjusteModelo.h"
 
 //para iluminación
 #include "CommonValues.h"
@@ -46,24 +46,52 @@ std::vector<Shader> shaderList;
 
 Camera camera;
 
-Texture brickTexture;
-Texture dirtTexture;
-Texture plainTexture;
-Texture dadoTexture;
+
 Texture pisoTexture;
-Texture Tagave;
-Texture Kitt_T;
-Texture Luces;
-Texture BoteBas_T;
+Texture materialBlanco;
+Texture materialDorado;
+Texture materialAzul;
+Texture materialGrisAzul;
+Texture materialNegro;
+Texture materialNegroTr;
+Texture materialGris;
+Texture materialGrisTr;
+Texture ladrillos;
+Texture pinturaCasa;
+Texture techo;
+Texture marmol;
+Texture marmolDos;
+Texture madera;
+Texture maderaGris;
+Texture puerta;
+Texture vidrio;
+Texture micro1;
+Texture micro2;
+Texture estufa;
+Texture cafetera1;
+Texture cafetera2;
+//Texture pared;
+Texture alacena1;
+Texture alacena2;
+Texture metal;
 
 
-Model Kitt_M;
-Model Llanta_M;
-Model Camino_M;
-Model Blackhawk_M;
-Model Lampara;
-Model BoteBasura;
-Model Arboles;
+Model casa;
+Model sofa;
+Model cama;
+Model mesa;
+Model tina;
+Model escusado;
+Model muebleBanio;
+Model toalla;
+Model ventana;
+Model comedor;
+Model banco;
+Model columna;
+Model lampara1;
+Model lampara2;
+Model cocina;
+
 
 
 Skybox skybox[11];
@@ -124,21 +152,6 @@ void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloa
 
 void CreateObjects()
 {
-	unsigned int indices[] = {
-		0, 3, 1,
-		1, 3, 2,
-		2, 3, 0,
-		0, 1, 2
-	};
-
-	GLfloat vertices[] = {
-		//	x      y      z			u	  v			nx	  ny    nz
-			-1.0f, -1.0f, -0.6f,	0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-			0.0f, -1.0f, 1.0f,		0.5f, 0.0f,		0.0f, 0.0f, 0.0f,
-			1.0f, -1.0f, -0.6f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f,		0.5f, 1.0f,		0.0f, 0.0f, 0.0f
-	};
-
 	unsigned int floorIndices[] = {
 		0, 2, 1,
 		1, 2, 3
@@ -151,119 +164,11 @@ void CreateObjects()
 		10.0f, 0.0f, 10.0f,		10.0f, 10.0f,	0.0f, -1.0f, 0.0f
 	};
 
-	unsigned int vegetacionIndices[] = {
-		0, 1, 2,
-		0, 2, 3,
-		4,5,6,
-		4,6,7
-	};
-
-	GLfloat vegetacionVertices[] = {
-		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		0.5f, 0.5f, 0.0f,		1.0f, 1.0f,		0.0f, 0.0f, 0.0f,
-		-0.5f, 0.5f, 0.0f,		0.0f, 1.0f,		0.0f, 0.0f, 0.0f,
-
-		0.0f, -0.5f, -0.5f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		0.0f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		0.0f, 0.5f, 0.5f,		1.0f, 1.0f,		0.0f, 0.0f, 0.0f,
-		0.0f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f, 0.0f, 0.0f,
-	};
-	calcAverageNormals(indices, 12, vertices, 32, 8, 5);
-
-	Mesh *obj1 = new Mesh();
-	obj1->CreateMesh(vertices, indices, 32, 12);
-	meshList.push_back(obj1);
-
-	Mesh *obj2 = new Mesh();
-	obj2->CreateMesh(vertices, indices, 32, 12);
-	meshList.push_back(obj2);
-
 	Mesh *obj3 = new Mesh();
 	obj3->CreateMesh(floorVertices, floorIndices, 32, 6);
 	meshList.push_back(obj3);
 
-	calcAverageNormals(vegetacionIndices, 12, vegetacionVertices, 64, 8, 5);
-
-	Mesh *obj4 = new Mesh();
-	obj4->CreateMesh(vegetacionVertices, vegetacionIndices, 64, 12);
-	meshList.push_back(obj4);
-
 }
-
-void CrearCubo()
-{
-	unsigned int cubo_indices[] = {
-		// front
-		0, 1, 2,
-		2, 3, 0,
-		// right
-		4, 5, 6,
-		6, 7, 4,
-		// back
-		8, 9, 10,
-		10, 11, 8,
-
-		// left
-		12, 13, 14,
-		14, 15, 12,
-		// bottom
-		16, 17, 18,
-		18, 19, 16,
-		// top
-		20, 21, 22,
-		22, 23, 20,
-	};
-
-
-	GLfloat cubo_vertices[] = {
-		// front
-		//x		y		z		S		T			NX		NY		NZ
-		-0.5f, -0.5f,  0.5f,	0.27f,  0.35f,		0.0f,	0.0f,	-1.0f,	//0
-		0.5f, -0.5f,  0.5f,		0.48f,	0.35f,		0.0f,	0.0f,	-1.0f,	//1
-		0.5f,  0.5f,  0.5f,		0.48f,	0.64f,		0.0f,	0.0f,	-1.0f,	//2
-		-0.5f,  0.5f,  0.5f,	0.27f,	0.64f,		0.0f,	0.0f,	-1.0f,	//3
-		// right
-		//x		y		z		S		T
-		0.5f, -0.5f,  0.5f,	    0.52f,  0.35f,		-1.0f,	0.0f,	0.0f,
-		0.5f, -0.5f,  -0.5f,	0.73f,	0.35f,		-1.0f,	0.0f,	0.0f,
-		0.5f,  0.5f,  -0.5f,	0.73f,	0.64f,		-1.0f,	0.0f,	0.0f,
-		0.5f,  0.5f,  0.5f,	    0.52f,	0.64f,		-1.0f,	0.0f,	0.0f,
-		// back
-		-0.5f, -0.5f, -0.5f,	0.77f,	0.35f,		0.0f,	0.0f,	1.0f,
-		0.5f, -0.5f, -0.5f,		0.98f,	0.35f,		0.0f,	0.0f,	1.0f,
-		0.5f,  0.5f, -0.5f,		0.98f,	0.64f,		0.0f,	0.0f,	1.0f,
-		-0.5f,  0.5f, -0.5f,	0.77f,	0.64f,		0.0f,	0.0f,	1.0f,
-
-		// left
-		//x		y		z		S		T
-		-0.5f, -0.5f,  -0.5f,	0.0f,	0.35f,		1.0f,	0.0f,	0.0f,
-		-0.5f, -0.5f,  0.5f,	0.23f,  0.35f,		1.0f,	0.0f,	0.0f,
-		-0.5f,  0.5f,  0.5f,	0.23f,	0.64f,		1.0f,	0.0f,	0.0f,
-		-0.5f,  0.5f,  -0.5f,	0.0f,	0.64f,		1.0f,	0.0f,	0.0f,
-
-		// bottom
-		//x		y		z		S		T
-		-0.5f, -0.5f,  0.5f,	0.27f,	0.02f,		0.0f,	1.0f,	0.0f,
-		0.5f,  -0.5f,  0.5f,	0.48f,  0.02f,		0.0f,	1.0f,	0.0f,
-		 0.5f,  -0.5f,  -0.5f,	0.48f,	0.31f,		0.0f,	1.0f,	0.0f,
-		-0.5f, -0.5f,  -0.5f,	0.27f,	0.31f,		0.0f,	1.0f,	0.0f,
-
-		//UP
-		 //x		y		z		S		T
-		 -0.5f, 0.5f,  0.5f,	0.27f,	0.68f,		0.0f,	-1.0f,	0.0f,
-		 0.5f,  0.5f,  0.5f,	0.48f,  0.68f,		0.0f,	-1.0f,	0.0f,
-		  0.5f, 0.5f,  -0.5f,	0.48f,	0.98f,		0.0f,	-1.0f,	0.0f,
-		 -0.5f, 0.5f,  -0.5f,	0.27f,	0.98f,		0.0f,	-1.0f,	0.0f,
-
-	};
-
-	Mesh *cubo = new Mesh();
-	cubo->CreateMesh(cubo_vertices, cubo_indices, 192, 36);
-	meshList.push_back(cubo);
-
-}
-
 
 
 void CreateShaders()
@@ -283,42 +188,98 @@ int main()
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.5f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.2f, 0.5f);
 
 	// INICIAÑIZACIÓN DE TEXTURAS
-	brickTexture = Texture("Textures/brick.png");
-	brickTexture.LoadTextureA();
-	dirtTexture = Texture("Textures/dirt.png");
-	dirtTexture.LoadTextureA();
-	plainTexture = Texture("Textures/plain.png");
-	plainTexture.LoadTextureA();
 	pisoTexture = Texture("Textures/piso.tga");
+	materialBlanco = Texture("Textures/BlancoPuro.png");
+	materialDorado = Texture("Textures/Dorado.png");
+	materialAzul = Texture("Textures/Azul.png");
+	materialGrisAzul = Texture("Textures/Gris-azul.png");
+	materialNegro = Texture("Textures/NegroCoche.png");
+	materialNegroTr = Texture("Textures/NegroTrans.png");
+	materialGris = Texture("Textures/GrisCoche.png");
+	materialGrisTr = Texture("Textures/GrisTrans.png");
+	ladrillos = Texture("Textures/Blue_glazed_pxr128_bmp.png");
+	pinturaCasa = Texture("Textures/Arch137_033_mat_009.jpg");
+	techo = Texture("Textures/Techo.png");
+	marmol = Texture("Textures/Brown_marble_pxr128_bmp.png");
+	marmolDos = Texture("Textures/Marble.jpg");
+	madera = Texture("Textures/WoodFine22_COL_3K.jpg");
+	maderaGris = Texture("Textures/Getama_Venus_Wood_r.jpg");
+	puerta = Texture("Textures/10057_wooden_door_v1_diffuse.jpg");
+	vidrio = Texture("Textures/Vidrio.png");
+	micro1 = Texture("Textures/micro_kit68.jpg");
+	micro2 = Texture("Textures/micro2_kit68.jpg");
+	estufa = Texture("Textures/gashob_kit68.jpg");
+	cafetera1 =	Texture("Textures/coffee_kit68.jpg");
+	cafetera2 =	Texture("Textures/coffee2_kit68.jpg");
+	//pared = Texture("Textures/plate_kit68.jpg");
+	alacena1 = Texture("Textures/Cabinets.png");
+	alacena2 = Texture("Textures/Cabinent2.png");
+	metal = Texture("Textures/Brush_metall.png");
+
 	pisoTexture.LoadTextureA();
-	Tagave = Texture("Textures/Agave.tga");
-	Tagave.LoadTextureA(); 
-	Kitt_T = Texture("Textures/Kitt2.tga");
-	Kitt_T.LoadTextureA();
-	Luces = Texture("Textures/Luces.tga");
-	Luces.LoadTextureA();
-	BoteBas_T = Texture("Texture/Trash_TrashTexture_BaseColor.png");
-	BoteBas_T.LoadTextureA();
+	materialBlanco.LoadTexture();
+	materialDorado.LoadTexture();
+	materialAzul.LoadTexture();
+	materialGrisAzul.LoadTexture();
+	materialNegro.LoadTexture();
+	materialNegroTr.LoadTexture();
+	materialGris.LoadTexture();
+	materialGrisTr.LoadTexture();
+	ladrillos.LoadTexture();
+	pinturaCasa.LoadTexture();
+	techo.LoadTexture();
+	marmol.LoadTexture();
+	marmolDos.LoadTexture();
+	madera.LoadTexture();
+	maderaGris.LoadTexture();
+	puerta.LoadTexture();
+	vidrio.LoadTexture();
+	micro1.LoadTexture();
+	micro2.LoadTexture();
+	estufa.LoadTexture();
+	cafetera1.LoadTexture();
+	cafetera2.LoadTexture();
+	//pared.LoadTexture();
+	alacena1.LoadTexture();
+	alacena2.LoadTexture();
+	metal.LoadTexture();
 
 	// INICIALIZACIÓN DE MODELOS
-	Kitt_M = Model();
-	Kitt_M.LoadModel("Models/Kitt_Texturizado.obj");
-	Llanta_M = Model();
-	Llanta_M.LoadModel("Models/llanta.obj");
-	Blackhawk_M = Model();
-	Blackhawk_M.LoadModel("Models/uh60.obj");
-	Camino_M = Model();
-	Camino_M.LoadModel("Models/railroad track.obj");/*
-	Lampara = Model();
-	Lampara.LoadModel("Models/LamparaCalle.obj");
-	BoteBasura = Model();
-	BoteBasura.LoadModel("Models/gv arbage-can-bin.obj");
-	Arboles = Model();
-	Arboles.LoadModel("Models/Grass.obj");*/
 
+	casa = Model();
+	sofa = Model();
+	cama = Model();
+	mesa = Model();
+	tina= Model();
+	escusado = Model();
+	muebleBanio = Model();
+	toalla = Model();
+	ventana = Model();
+	comedor	= Model();
+	banco = Model();
+	columna = Model();
+	lampara1 = Model();
+	lampara2 = Model();
+	cocina = Model();
+
+	casa.LoadModel("Models/Casa.obj");
+	sofa.LoadModel("Models/Sofa.obj");
+	cama.LoadModel("Models/Cama.obj");
+	mesa.LoadModel("Models/Escritorio.obj");
+	tina.LoadModel("Models/Tina.obj");
+	escusado.LoadModel("Models/Excusado.obj");
+	muebleBanio.LoadModel("Models/MuebleBanio.obj");
+	toalla.LoadModel("Models/Toalla.obj");
+	ventana.LoadModel("Models/Ventanas.obj");
+	comedor.LoadModel("Models/MesaComedor.obj");
+	banco.LoadModel("Models/Banco.obj");
+	columna.LoadModel("Models/Columna.obj");
+	lampara1.LoadModel("Models/Lampara1.obj");
+	lampara2.LoadModel("Models/Lampara2.obj");
+	cocina.LoadModel("Models/Cocina.obj");
 
 	std::string skyboxPath = "Textures/Skybox/";
 	std::string skyboxPathBuf = "Textures/Skybox/";
@@ -327,21 +288,7 @@ int main()
 	Shader* skyShader = new Shader();
 	skyShader->CreateFromFiles("shaders/skybox.vert", "shaders/skybox.frag");
 
-	//skyboxFaces.push_back(skyboxPath.append("Right").append(std::to_string(8)).append(".jpg"));
-	//skyboxPath = skyboxPathBuf;
-	//skyboxFaces.push_back(skyboxPath.append("Left").append(std::to_string(8)).append(".jpg"));
-	//skyboxPath = skyboxPathBuf;
-	//skyboxFaces.push_back(skyboxPath.append("Bottom").append(std::to_string(8)).append(".jpg"));
-	//skyboxPath = skyboxPathBuf;
-	//skyboxFaces.push_back(skyboxPath.append("Top").append(std::to_string(8)).append(".jpg"));
-	//skyboxPath = skyboxPathBuf;
-	//skyboxFaces.push_back(skyboxPath.append("Front").append(std::to_string(8)).append(".jpg"));
-	//skyboxPath = skyboxPathBuf;
-	//skyboxFaces.push_back(skyboxPath.append("Back").append(std::to_string(8)).append(".jpg"));
-	//skyboxPath = skyboxPathBuf;
-	//skybox[0] = Skybox(skyboxFaces,skyShader);
-
-	for (int i = 0; i < 11; i++) {
+	for (int i = 0; i < 5; i++) {
 
 		skyboxFaces.push_back(skyboxPath.append("Right").append(std::to_string(i)).append(".jpg"));
 		skyboxPath = skyboxPathBuf;
@@ -365,21 +312,8 @@ int main()
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
 
-	//posición incial del helicoptero
-	glm::vec3 posblackhawk = glm::vec3(-20.0f, 6.0f, -1.0f);
-	//posición inicial de Kitt
-	glm::vec3 posKitt = glm::vec3(0.0f, 1.2f, 0.0f);
-
-	// DEFINICIÓN POSICIÓN INICIAL LUCES
-	glm::vec3 positionIniRL = glm::vec3(posKitt.x -14.8f, posKitt.y + 1.2f, posKitt.z);
-	glm::vec3 positionIniF1 = glm::vec3(posKitt.x -11.5f, posKitt.y , posKitt.z - 3.4f);
-	glm::vec3 positionIniF2 = glm::vec3(posKitt.x -11.5f, posKitt.y , posKitt.z + 3.0f);
-	
-	glm::vec3 positionIniFH = glm::vec3(posblackhawk.x -2.6f, posblackhawk.y - 1.0f, posblackhawk.z);
-	
 
 	
-
 	//luz direccional, sólo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
 		0.5f, 0.3f,
@@ -389,49 +323,16 @@ int main()
 
 	unsigned int spotLightCount = 0;
 	
-	////linterna
-	//spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
-	//	0.0f, 1.0f,
-	//	0.0f, 0.0f, 0.0f,
-	//	0.0f, -1.0f, 0.0f,
-	//	1.0f, 0.0f, 0.0f,
-	//	10.0f);
-	//spotLightCount++;
-
-	//luz Faros de Kitt
+	//linterna
 	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
-		1.0f, 2.0f,
-		positionIniF1.x, positionIniF1.y, positionIniF1.z,
-		-1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		10.0f);
-	spotLightCount++;
-
-	spotLights[1] = SpotLight(1.0f, 1.0f, 1.0f,
-		1.0f, 2.0f,
-		positionIniF2.x, positionIniF2.y, positionIniF2.z,
-		-1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		10.0f);
-	spotLightCount++;
-	
-	//Declaración de primer luz puntual roja
-	pointLights[0] = PointLight(1.0f, 0.0f, 0.0f,
 		0.0f, 1.0f,
-		positionIniRL.x, positionIniRL.y, positionIniRL.z,
-		0.3f, 0.2f, 0.1f);
-	pointLightCount++;
-	
-
-	//luz de helicóptero
-
-	spotLights[2] = SpotLight(1.0f, 1.0f, 1.0f,
-		1.0f, 2.0f,
-		positionIniFH.x, positionIniFH.y, positionIniFH.z,
-		-1.0f, -1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
-		15.0f);
+		10.0f);
 	spotLightCount++;
+
+	
 
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
@@ -443,8 +344,7 @@ int main()
 	double paso = 3;
 	float t=0.0;
 	bool f1 = 1,f2 = 1;
-
-
+	AjusteModelo ajuste = AjusteModelo(5);
 	
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
@@ -465,7 +365,7 @@ int main()
 				hora++;
 				f1 = 1;
 			}
-			if (hora > 9)
+			if (hora > 3)
 				f2 = 0;
 		}
 		else {
@@ -481,6 +381,8 @@ int main()
 		glfwPollEvents();
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+
+		ajuste.ajustar(mainWindow.getsKeys());
 
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -500,15 +402,6 @@ int main()
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
 		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
-		//luz ligada a la cámara de tipo flash 
-		glm::vec3 lowerLight = camera.getCameraPosition();
-		lowerLight.y -= 0.3f;
-		//spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
-		spotLights[0].SetPos(glm::vec3(positionIniF1.x + mainWindow.getKittX(), positionIniF1.y, positionIniF1.z + mainWindow.getKittZ()));
-		spotLights[1].SetPos(glm::vec3(positionIniF2.x + mainWindow.getKittX(), positionIniF2.y, positionIniF2.z + mainWindow.getKittZ()));
-		spotLights[2].SetPos(glm::vec3(positionIniFH.x + mainWindow.getBHx(), positionIniFH.y + mainWindow.getBHy(), positionIniFH.z));
-	
-		pointLights[0].SetPos(glm::vec3(positionIniRL.x + mainWindow.getKittX(), positionIniRL.y, positionIniRL.z + mainWindow.getKittZ()));
 
 
 		//información al shader de fuentes de iluminación
@@ -527,70 +420,188 @@ int main()
 		pisoTexture.UseTexture();
 		//agregar material al plano de piso
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		meshList[2]->RenderMesh();
+		meshList[0]->RenderMesh();
+
+		//Casa
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0.0f,2.0f,0.0f));
+		model = glm::scale(model, glm::vec3(4.0f,4.0f,4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		casa.RenderModel();
+		
+		//Sofa
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(17.78f,2.74f,-16.0f));
+		model = glm::scale(model, glm::vec3(0.21f,0.21f,0.21f));
+		model = glm::rotate(model, 90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		sofa.RenderModel();
+		
+		//Cama 1
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(37.26f,2.82f,6.18f));
+		model = glm::scale(model, glm::vec3(0.30f,0.30f,0.30f));
+		model = glm::rotate(model, -90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		cama.RenderModel();
+		
+		//Cama 2
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(20.20f,2.82f,6.24f));
+		model = glm::scale(model, glm::vec3(0.30f,0.30f,0.30f));
+		model = glm::rotate(model, 90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		cama.RenderModel();
+		
+		//Cama 3
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-18.14f,2.82f,8.74f));
+		model = glm::scale(model, glm::vec3(0.30f,0.30f,0.30f));
+		model = glm::rotate(model, -90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		cama.RenderModel();
+
+		
+		//Cama 4
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-5.48f,2.82f,8.8f));
+		model = glm::scale(model, glm::vec3(0.30f,0.30f,0.30f));
+		model = glm::rotate(model, 90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		cama.RenderModel();
+
+		//Escritorio
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(31.46f, 2.72f, 7.18f));
+		model = glm::scale(model, glm::vec3(1.46f, 1.46f, 1.46f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		mesa.RenderModel();
+
+		//Banco
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(32.56f, 2.72f, 7.0f));
+		model = glm::scale(model, glm::vec3(2.24f, 2.24f, 2.24f));
+		model = glm::rotate(model, 72 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		banco.RenderModel();
+
+		//Comedor
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(10.36f, 2.74f, -13.46f));
+		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		comedor.RenderModel();
+
+		//Columna 1
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-0.66f, -2.6f, 1.42f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		columna.RenderModel();
+
+		//Columna 2
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-0.66f, -2.6f, 11.7f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		columna.RenderModel();
+
+		//Columna 3
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-22.92f, -2.6f, 11.7f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		columna.RenderModel();
+
+
+		//Columna 4
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-22.92f, -2.6f, 1.42f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		columna.RenderModel();
+
+		//Columna 5
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-14.24f, -2.6f, -5.62f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		columna.RenderModel();
+
+		//Columna 6
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-5.46f, -2.6f, -5.62f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		columna.RenderModel();
+		
+
+		//Columna 7
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-4.54f, -2.54f, -19.48f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		columna.RenderModel();
+
+
+		//Columna 8
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(13.44f, -2.54f, -19.48f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		columna.RenderModel();
+		
+		//Lampara1
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(15.02f, 2.82f, -16.4f));
+		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		lampara1.RenderModel();
+
 
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(ajuste.getX(), ajuste.getY(), ajuste.getZ()));
+		model = glm::scale(model, glm::vec3(ajuste.getEscala(), ajuste.getEscala(), ajuste.getEscala()));
+		model = glm::rotate(model, ajuste.getRotacion()*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Tagave.UseTexture();
-		meshList[3]->RenderMesh();
-
-		
-		//agregar su coche y ponerle material
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(posKitt.x + mainWindow.getKittX(), posKitt.y, posKitt.z + mainWindow.getKittZ()));
-		modelAux = model;
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model)); 
-		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		Kitt_M.RenderModel();
-
-		model = modelAux;
-		model = glm::translate(model, glm::vec3(-6.80f, -1.08f, -6.00f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();		
-		
-		model = modelAux;
-		model = glm::translate(model, glm::vec3(-6.80f, -1.08f, 6.00f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();		
-		
-		
-		model = modelAux;
-		model = glm::translate(model, glm::vec3(10.31f, -1.08f, 6.00f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();		
-		
-		
-		model = modelAux;
-		model = glm::translate(model, glm::vec3(10.31f, -1.08f, -6.00f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Llanta_M.RenderModel();		
-		
-	
-		//model = glm::mat4(1.0);/*
-		//model = glm::translate(model, glm::vec3(10.0f, 5.0f , 10.0f));*/
-		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		////agregar material al helicóptero
-		//Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		//BoteBasura.RenderModel();
+		switch (ajuste.getModelo()) {
+		case 0:
+			cocina.RenderModel();
+			break;
+		case 1:
+			muebleBanio.RenderModel();
+			break;
+		case 2:
+			lampara1.RenderModel();
+			break;
+		case 3:
+			lampara2.RenderModel();
+			break;
+		case 4:
+			columna.RenderModel();
+			break;
+		/*case 5:
+			break;
+		case 6:
+			break;
+		case 7:
+			break;
+		case 8:
+			break;
+		case 9:
+			toalla.RenderModel();
+			break;
+		case 10:
+			columna.RenderModel();
+			break;
+		case 11:
+			break;*/
+		default:
+			break;
+		}
 
 
-		//agregar incremento en X con teclado
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-20.0f + mainWindow.getBHx(), 30.0f + mainWindow.getBHy(), -1.0));
-		model = glm::scale(model, glm::vec3(3.5f, 3.5f, 3.5f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		//agregar material al helicóptero
-		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		Blackhawk_M.RenderModel();
-		//¿Cómo ligas la luz al helicóptero?
 
 
 

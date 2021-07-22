@@ -57,6 +57,9 @@
     <ClCompile Include="Window.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="AjusteModelo.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -107,6 +110,23 @@
     <ClInclude Include="Window.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="AjusteModelo.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shader_light.frag">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\shader_light.vert">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\skybox.frag">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\skybox.vert">
+      <Filter>Archivos de recursos</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader_light.frag">
