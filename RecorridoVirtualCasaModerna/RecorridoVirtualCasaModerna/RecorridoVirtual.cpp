@@ -315,7 +315,7 @@ int main()
 	columna.LoadModel("Models/Columna.obj");
 	lampara1.LoadModel("Models/Lampara1.obj");
 	lampara2.LoadModel("Models/Lampara2.obj");
-	cocina.LoadModel("Models/Cocina.obj");
+	cocina.LoadModel("Models/Cocina2.obj");
 	ventanaChica.LoadModel("Models/VentanaChica.obj");
 	planta1.LoadModel("Models/Planta1.obj");
 	planta2.LoadModel("Models/Planta2.obj");
@@ -804,9 +804,7 @@ int main()
 		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		cocina.RenderModel();
-		
-
-
+	
 
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(ajuste.getX(), ajuste.getY(), ajuste.getZ()));
