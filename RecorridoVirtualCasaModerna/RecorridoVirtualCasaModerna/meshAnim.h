@@ -1,23 +1,3 @@
-meshAnim.h
-A
-Tipo
-C
-Tamaño
-6 kB
-Almacenamiento usado
-26 kB
-Ubicación
-include
-Propietario
-André Marqueda
-Modificado
-13 jul 2021 por André Marqueda
-Abierto
-8:52 por mí
-Creado
-9 jul 2021
-Añadir descripción
-Los usuarios con acceso de lectura pueden descargar este elemento
 #ifndef MESH_ANIM_H
 #define MESH_ANIM_H
 
