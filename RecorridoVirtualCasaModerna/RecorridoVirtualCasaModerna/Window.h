@@ -13,16 +13,11 @@ public:
 	GLfloat getBufferHeight() { return bufferHeight; }
 	GLfloat getXChange();
 	GLfloat getYChange();
-	GLfloat getKittX() { return kittX; }
-	GLfloat getKittZ() { return kittZ; }
-	GLfloat getBHx() { return BHx; }
-	GLfloat getBHy() { return BHy; }
-	GLfloat getBHz() { return BHz; }
 	bool getShouldClose() {
 		return  glfwWindowShouldClose(mainWindow);}
 	bool* getsKeys() { return keys; }
 	void swapBuffers() { return glfwSwapBuffers(mainWindow); }
-	
+	bool getPlayAnimation() { return playAnimation; }
 	~Window();
 private: 
 	GLFWwindow *mainWindow;
@@ -34,11 +29,7 @@ private:
 	GLfloat lastY;
 	GLfloat xChange;
 	GLfloat yChange;
-	GLfloat kittX;
-	GLfloat kittZ;
-	GLfloat BHx;
-	GLfloat BHy;
-	GLfloat BHz;
+	bool playAnimation;
 
 	bool mouseFirstMoved;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);

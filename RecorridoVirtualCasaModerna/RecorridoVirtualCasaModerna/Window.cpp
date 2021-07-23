@@ -4,6 +4,7 @@ Window::Window()
 {
 	width = 800;
 	height = 600;
+	playAnimation = 0;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -13,11 +14,7 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 {
 	width = windowWidth;
 	height = windowHeight;
-	kittX = 0.0f;
-	kittZ = 0.0f;
-	BHx = 0.0f;
-	BHy = 0.0f;
-	BHz = 0.0f;
+	playAnimation = 0;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -108,39 +105,14 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-	if (key == GLFW_KEY_Y)
+	if (key == GLFW_KEY_X)
 	{
-		theWindow-> kittX += 1.0;
+		theWindow-> playAnimation = 1;
 	}
-	if (key == GLFW_KEY_U)
+	if (key == GLFW_KEY_R)
 	{
-		theWindow-> kittX -= 1.0;
+		theWindow-> playAnimation = 0;
 	}
-	if (key == GLFW_KEY_I)
-	{
-		theWindow-> kittZ += 1.0;
-	}
-	if (key == GLFW_KEY_O)
-	{
-		theWindow-> kittZ -= 1.0;
-	}
-	if (key == GLFW_KEY_J)
-	{
-		theWindow-> BHx += 1.0;
-	}
-	if (key == GLFW_KEY_K)
-	{
-		theWindow-> BHx -= 1.0;
-	}
-	if (key == GLFW_KEY_H)
-	{
-		theWindow-> BHy += 1.0;
-	}
-	if (key == GLFW_KEY_L)
-	{
-		theWindow-> BHy -= 1.0;
-	}
-
 
 
 	if (key >= 0 && key < 1024)

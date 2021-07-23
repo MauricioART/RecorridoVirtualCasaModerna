@@ -39,6 +39,8 @@ Cambios en el shader, en lugar de enviar la textura en el shader de fragmentos, 
 #include "Material.h"
 
 const float toRadians = 3.14159265f / 180.0f;
+const float pi = 3.14159265f;
+
 
 Window mainWindow;
 std::vector<Mesh*> meshList;
@@ -126,6 +128,10 @@ GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
 static double limitFPS = 1.0 / 60.0;
 
+struct variablesAnim {
+	float x = 0.0f, y = 0.0f, z = 0.0f, xIni = 0.0f, yIni = 0.0f, zIni = 0.0f,Rot=0.0f,rotIni,escala = 1.0f;
+	float xp, yp, zp;
+};
 
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
@@ -240,7 +246,7 @@ int main()
 	pinturaAmarilla2 = Texture("Textures/background-1126926_640.jpg");
 
 
-	pisoTexture.LoadTextureA();
+	pisoTexture.LoadTexture();
 	materialBlanco.LoadTexture();
 	materialDorado.LoadTexture();
 	materialAzul.LoadTexture();
@@ -386,10 +392,31 @@ int main()
 
 	int hora = 0;
 	double paso = 3;
-	float t=0.0;
+	float t2 = 0,t3 = 0;
 	bool f1 = 1,f2 = 1;
-	AjusteModelo ajuste = AjusteModelo(5);
-	
+	bool b1= 1, b2=0, b3=0, b4=0;/*
+	AjusteModelo ajuste = AjusteModelo(5);*/
+
+	//Variables para animaciones
+	variablesAnim avionPar = variablesAnim();
+	variablesAnim cochePar = variablesAnim();
+	variablesAnim audiPar = variablesAnim();
+
+	avionPar.xIni = -15.0f;
+	avionPar.yIni = 7.5f;
+	avionPar.zIni = -8.0f;
+	avionPar.escala = 0.015f;
+	avionPar.rotIni = 0;
+
+	cochePar.xIni = 17.7f;
+	cochePar.yIni = 2.74f;
+	cochePar.zIni = -12.0f;
+	cochePar.escala = 0.2f;
+	cochePar.rotIni = 90 * toRadians;
+
+	float t = 0.0f;
+	float w = 15, w2 = 20;
+
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
@@ -426,7 +453,7 @@ int main()
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
-		ajuste.ajustar(mainWindow.getsKeys());
+		/*ajuste.ajustar(mainWindow.getsKeys());*/
 
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -799,14 +826,110 @@ int main()
 
 		//Cocina
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.28f, 2.66f, -3.18f));
+		model = glm::translate(model, glm::vec3(0.28f, 2.66f, -13.18f));
 		model = glm::scale(model, glm::vec3(1.95f, 1.95f, 1.95f));
 		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		cocina.RenderModel();
 	
+		if (mainWindow.getPlayAnimation()) {
+			if (t2 <= 45 || t2 >= 315) {
+				cochePar.x = cochePar.xIni + 3 * cos(t2 * toRadians)*sqrt(cos(2 * t2* toRadians));
+				cochePar.z = cochePar.zIni + 3 * sin(t2* toRadians)*sqrt(cos(2 * t2* toRadians));
+				if (t2 == 45)
+					t2 = 135;
+				if (t2 == 360)
+					t2 = 0;
+			}
+			else if(t2 <= 225) {
+				cochePar.x = cochePar.xIni + 3 * cos(t2* toRadians)*sqrt(cos(2 *t2* toRadians));
+				cochePar.z = cochePar.zIni - 3 * sin(t2* toRadians)*sqrt(cos(2 *t2* toRadians));
+				if (t2 == 225)
+					t2 = 315;
+			}
+			if (t2 < 45 || t2 > 315) {
+				cochePar.xp = -3 * sin(t2*toRadians)*sqrt(cos(2 * toRadians*t2)) - 3 * cos(t2*toRadians)*sin(2 * t2*toRadians) / (sqrt(cos(2 * t2*toRadians)));
+				cochePar.zp = 3 * cos(t2*toRadians)*sqrt(cos(2 * toRadians*t2)) - 3 * sin(t2*toRadians)*sin(2 * t2*toRadians) / (sqrt(cos(2 * t2*toRadians)));
+				cochePar.Rot = cochePar.rotIni + atan(cochePar.zp / cochePar.xp);
+			}
+			else if (t2 < 225 ) {
+				cochePar.xp = -3 * sin(t2*toRadians)*sqrt(cos(2 * toRadians*t2)) - 3 * cos(t2*toRadians)*sin(2 * t2*toRadians) / (sqrt(cos(2 * t2*toRadians)));
+				cochePar.zp = -3 * cos(t2*toRadians)*sqrt(cos(2 * toRadians*t2)) + 3 * sin(t2*toRadians)*sin(2 * t2*toRadians) / (sqrt(cos(2 * t2*toRadians)));
+				cochePar.Rot =cochePar.rotIni + atan(cochePar.zp / cochePar.xp);
+			}
+			if (t2 >= 180 && t2 <= 360) {
+				cochePar.Rot += 180 *toRadians;
+			}
 
+			if (b1 && t3 <= 30) {
+				if (t3 == 30) {
+					t3 = 210;
+					b1 = 0;
+					b2 = 1;
+				}
+			}
+			if (b2 && t3 <= 270) {
+				if (t3 == 270) {
+					t3 = 90;
+					b2 = 0;
+					b3 = 1;
+				}
+			}
+			if (b3 && t3 <= 150) {
+				if (t3 == 150) {
+					t3 = 330;
+					b4 = 1;
+					b3 = 0;
+				}
+			}
+			if (b4 && t3 <= 360) {
+				if (t3 == 360) {
+					t3 = 0;
+					b4 = 0;
+					b1 = 1;
+				}
+			}
+			avionPar.y = avionPar.yIni + 5 * cos(t3*toRadians)*sqrt(cos(3 *t3*toRadians));
+			avionPar.z = avionPar.zIni + 5 * sin(t3*toRadians)*sqrt(cos(3 *t3*toRadians));
+
+			if ((int)t3 % 30 != 0) {
+				avionPar.yp = -5 * sin(t3*toRadians)*sqrt(cos(3 * t3*toRadians)) - (15 / 2)* (cos(t3*toRadians)*sin(3 * t3*toRadians)) / (sqrt(cos(3 * t3*toRadians)));
+				avionPar.zp = 5 * cos(t3*toRadians)*sqrt(cos(3 * t3*toRadians)) - (15 / 2)* (sin(t3*toRadians)*sin(3 * t3*toRadians)) / (sqrt(cos(3 * t3*toRadians)));
+				if (avionPar.zp != 0)
+					avionPar.Rot = avionPar.rotIni + atan(avionPar.yp / avionPar.zp); 
+				/*if ((t3 >= 114.47 && t3 <= 150) || (t3 >= 339.59 && t3 <= 360) || (t3 >= 21 && t3 <= 30) || (t3 >= 210 && t3 <= 245.51)) {
+					avionPar.Rot -= 180 * toRadians;
+				}*/if ((t3 >= 114.47 && t3 <= 150) || (t3 >= 330 && t3 <= 339.59) || (t3 >= 21 && t3 <= 30) || (t3 >= 210 && t3 <= 245.51)) {
+					avionPar.Rot -= 180 * toRadians;
+				}
+			}
+			t3 += 1;
+			t2 += 1;
+		}
+		else {
+			t2 = 0;
+			t3 = 0;
+		}
+	
+		//Coche de RC
 		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(cochePar.x, cochePar.yIni, cochePar.z));
+		model = glm::scale(model, glm::vec3(cochePar.escala, cochePar.escala, cochePar.escala));
+		model = glm::rotate(model, -cochePar.Rot, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		cocheRC.RenderModel();
+
+
+		//Coche de RC
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(avionPar.xIni, avionPar.y, avionPar.z));
+		model = glm::scale(model, glm::vec3(avionPar.escala, avionPar.escala, avionPar.escala));
+		model = glm::rotate(model, - avionPar.Rot, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		avion.RenderModel();
+
+
+		/*model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(ajuste.getX(), ajuste.getY(), ajuste.getZ()));
 		model = glm::scale(model, glm::vec3(ajuste.getEscala(), ajuste.getEscala(), ajuste.getEscala()));
 		model = glm::rotate(model, ajuste.getRotacion()*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -829,7 +952,7 @@ int main()
 			break;
 		default:
 			break;
-		}
+		}*/
 
 
 

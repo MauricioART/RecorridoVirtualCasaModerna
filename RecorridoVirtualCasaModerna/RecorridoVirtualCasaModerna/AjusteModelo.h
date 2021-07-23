@@ -19,5 +19,4 @@ public:
 	int getModelo() { return modelo; };
 	float getEscala() { return escala; };
 	float getRotacion() { return rotacion; };
-	
 };
