@@ -4,7 +4,8 @@ Window::Window()
 {
 	width = 800;
 	height = 600;
-	playAnimation = 0;
+	playAnimation = 1;
+	play = 0;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -14,7 +15,8 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 {
 	width = windowWidth;
 	height = windowHeight;
-	playAnimation = 0;
+	playAnimation = 1;
+	play = 0;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -113,7 +115,12 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		theWindow-> playAnimation = 0;
 	}
-
+	if (key == GLFW_KEY_V) {
+		theWindow->play = 1;
+	}
+	if (key == GLFW_KEY_B) {
+		theWindow->play = 0;
+	}
 
 	if (key >= 0 && key < 1024)
 	{

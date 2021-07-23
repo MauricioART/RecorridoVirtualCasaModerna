@@ -18,6 +18,7 @@ public:
 	bool* getsKeys() { return keys; }
 	void swapBuffers() { return glfwSwapBuffers(mainWindow); }
 	bool getPlayAnimation() { return playAnimation; }
+	bool getPlay() { return play; }
 	~Window();
 private: 
 	GLFWwindow *mainWindow;
@@ -30,6 +31,7 @@ private:
 	GLfloat xChange;
 	GLfloat yChange;
 	bool playAnimation;
+	bool play;
 
 	bool mouseFirstMoved;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);

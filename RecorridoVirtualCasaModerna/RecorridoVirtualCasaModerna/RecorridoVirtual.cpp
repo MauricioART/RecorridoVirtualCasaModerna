@@ -82,7 +82,11 @@ Texture pinturaVerde;
 Texture pinturaVerde2;
 Texture pinturaAmarilla;
 Texture pinturaAmarilla2;
-
+Texture piel;
+Texture mochila;
+Texture cafe;
+Texture rojoEllie;
+Texture gray;
 
 Model casa;
 Model sofa;
@@ -91,7 +95,6 @@ Model mesa;
 Model tina;
 Model escusado;
 Model muebleBanio;
-Model toalla;
 Model ventana;
 Model comedor;
 Model banco;
@@ -107,7 +110,113 @@ Model avion;
 Model cocheRC;
 Model audi;
 Model balon;
+Model chico;
+Model ellie;
 
+///////////////////////////////KEYFRAMES/////////////////////
+
+
+bool animacion = false;
+
+
+
+//NEW// Keyframes
+
+#define MAX_FRAMES 100
+int i_max_steps = 20;
+int i_curr_steps = 0;
+typedef struct _frame
+{
+	float x, z, yRot;
+	float xInc, zInc, yRotInc;
+
+}FRAME;
+
+FRAME KeyFrame[MAX_FRAMES];
+int FrameIndex = 37;			//introducir datos
+bool play = true;
+int playIndex = 0;
+
+//void saveFrame(void) //tecla L
+//{
+//
+//	printf("frameindex %d\n", FrameIndex);
+//
+//
+//	KeyFrame[FrameIndex].movAvion_x = movAvion_x;
+//	KeyFrame[FrameIndex].movAvion_y = movAvion_y;
+//	KeyFrame[FrameIndex].giroAvion;
+//	//no volatil, agregar una forma de escribir a un archivo para guardar los frames
+//	FrameIndex++;
+//}
+float x, z, yRot;
+float xIni, zIni, yRotIni;
+
+void resetElements(void) //Tecla 0
+{
+
+	x = KeyFrame[0].x;
+	z = KeyFrame[0].z;
+	yRot = KeyFrame[0].yRot;
+	
+}
+
+void interpolation(void)
+{/*
+	printf("Hola estoy en el playIndex: &i\n", playIndex);*/
+	KeyFrame[playIndex].xInc = (KeyFrame[playIndex + 1].x - KeyFrame[playIndex].x) / i_max_steps;
+	KeyFrame[playIndex].zInc = (KeyFrame[playIndex + 1].z - KeyFrame[playIndex].z) / i_max_steps;
+	KeyFrame[playIndex].yRotInc = (KeyFrame[playIndex + 1].yRot - KeyFrame[playIndex].yRot) / i_max_steps;
+
+	/*printf("(xInc,zInc,yRotInc)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].xInc, KeyFrame[playIndex].zInc, KeyFrame[playIndex].yRotInc);*/
+}
+
+
+void animate(void)
+{
+	//Movimiento del objeto // barra espaciadora
+	if (play)
+	{
+		/*if (firstTime)
+			interpolation();*/
+		if (i_curr_steps >= i_max_steps) //end of animation between frames?
+		{
+			if (playIndex > FrameIndex - 2)	//end of total animation?
+			{
+				printf("Frame index= %d\n", FrameIndex);
+				printf("termina anim\n");
+				playIndex = 0;
+				play = false;
+				resetElements();
+			}
+			else //Next frame interpolations
+			{
+				//printf("entro aquí\n");
+				i_curr_steps = 0; //Reset counter
+				//Interpolation
+				interpolation();
+			}
+			playIndex++;
+		}
+		else
+		{
+			//printf("se quedó aqui\n");
+			//printf("max steps: %f", i_max_steps);
+			//Draw animation
+			x += KeyFrame[playIndex-1].xInc;
+			z += KeyFrame[playIndex-1].zInc;
+			yRot += KeyFrame[playIndex-1].yRotInc;
+			i_curr_steps++;
+			printf("playIndez = %d\n", playIndex);
+			printf("(x,z,yRot)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].x, KeyFrame[playIndex].z, KeyFrame[playIndex].yRot);
+			printf("(xInc,zInc,yRotInc)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].xInc, KeyFrame[playIndex].zInc, KeyFrame[playIndex].yRotInc);
+
+		}
+
+	}
+}
+
+///////////////* FIN KEYFRAMES*////////////////////////////
 
 
 Skybox skybox[11];
@@ -244,7 +353,11 @@ int main()
 	pinturaVerde2 = Texture("Textures/Green.png");
 	pinturaAmarilla = Texture("Textures/Amarillo.png");
 	pinturaAmarilla2 = Texture("Textures/background-1126926_640.jpg");
-
+	piel = Texture("Textures/Piel.png");
+	mochila = Texture("Textures/Mochila.png");
+	cafe = Texture("Textures/Cafe.png");
+	rojoEllie = Texture("Textures/RojoEllie.png");
+	gray = Texture("Textures/Gray.png");
 
 	pisoTexture.LoadTexture();
 	materialBlanco.LoadTexture();
@@ -279,6 +392,11 @@ int main()
 	pinturaVerde2.LoadTexture();
 	pinturaAmarilla.LoadTexture();
 	pinturaAmarilla2.LoadTexture();
+	piel.LoadTexture();
+	gray.LoadTexture();
+	rojoEllie.LoadTexture();
+	mochila.LoadTexture();
+	cafe.LoadTexture();
 
 	// INICIALIZACIÓN DE MODELOS
 
@@ -289,7 +407,6 @@ int main()
 	tina = Model();
 	escusado = Model();
 	muebleBanio = Model();
-	toalla = Model();
 	ventana = Model();
 	comedor = Model();
 	banco = Model();
@@ -306,6 +423,8 @@ int main()
 	cocheRC = Model();
 	audi = Model();
 	balon = Model();
+	chico = Model();
+	ellie = Model();
 
 	casa.LoadModel("Models/Casa.obj");
 	sofa.LoadModel("Models/Sofa.obj");
@@ -314,7 +433,6 @@ int main()
 	tina.LoadModel("Models/Tina.obj");
 	escusado.LoadModel("Models/Escusado.obj");
 	muebleBanio.LoadModel("Models/MuebleBanio.obj");
-	toalla.LoadModel("Models/Toalla.obj");
 	ventana.LoadModel("Models/Ventanas.obj");
 	comedor.LoadModel("Models/MesaComedor.obj");
 	banco.LoadModel("Models/Banco.obj");
@@ -330,6 +448,8 @@ int main()
 	cocheRC.LoadModel("Models/CocheRC.obj");
 	audi.LoadModel("Models/Audi.obj");
 	balon.LoadModel("Models/Balon.obj");
+	chico.LoadModel("Models/Guy1.obj");
+	ellie.LoadModel("Models/Ellie.obj");
 
 	std::string skyboxPath = "Textures/Skybox/";
 	std::string skyboxPathBuf = "Textures/Skybox/";
@@ -382,8 +502,158 @@ int main()
 		10.0f);
 	spotLightCount++;
 
-	
+	// KeyFrames
+	KeyFrame[0].x = 42.7f;
+	KeyFrame[0].z = 22.9f;
+	KeyFrame[0].yRot = -90;
 
+	x = KeyFrame[0].x;
+    z = KeyFrame[0].z;
+	yRot = KeyFrame[0].yRot;
+
+	KeyFrame[1].x = 30.9f;
+	KeyFrame[1].z = 22.9f;
+	KeyFrame[1].yRot = -90;
+
+	KeyFrame[2].x = 22.3f;
+	KeyFrame[2].z = 22.9f;
+	KeyFrame[2].yRot = -94;
+
+	KeyFrame[3].x = 18.16f;
+	KeyFrame[3].z = 22.10f;
+	KeyFrame[3].yRot = -99;
+
+	KeyFrame[4].x = 15.5f;
+	KeyFrame[4].z = 21.2f;
+	KeyFrame[4].yRot = -105;
+
+	KeyFrame[5].x = 13.8f;
+	KeyFrame[5].z = 20.5f;
+	KeyFrame[5].yRot = -123;
+
+	KeyFrame[6].x = 11.3f;
+	KeyFrame[6].z = 18.7f;
+	KeyFrame[6].yRot = -135;
+
+	KeyFrame[7].x = 9.4f;
+	KeyFrame[7].z = 15.2f;
+	KeyFrame[7].yRot = -153;
+
+	KeyFrame[8].x = 7.8f;
+	KeyFrame[8].z = 13.0f;
+	KeyFrame[8].yRot = -145;
+
+	KeyFrame[9].x = 6.3f;
+	KeyFrame[9].z = 11.5f;
+	KeyFrame[9].yRot = -129;
+
+	KeyFrame[10].x = 5.4f;
+	KeyFrame[10].z = 10;
+	KeyFrame[10].yRot = -124;
+
+	KeyFrame[11].x = 3.9f;
+	KeyFrame[11].z = 8.5f;
+	KeyFrame[11].yRot = -113;
+
+	KeyFrame[12].x = 2.6f;
+	KeyFrame[12].z = 7.7f;
+	KeyFrame[12].yRot = -103;
+
+	KeyFrame[13].x = 1.5f;
+	KeyFrame[13].z = 7.4f;
+	KeyFrame[13].yRot = -97;
+
+	KeyFrame[14].x = -2.1f;
+	KeyFrame[14].z = 7.3f;
+	KeyFrame[14].yRot = -92;
+
+	KeyFrame[15].x = -6;
+	KeyFrame[15].z = 7.25f;
+	KeyFrame[15].yRot = -90;
+
+	KeyFrame[16].x = -10;
+	KeyFrame[16].z = 7.25f;
+	KeyFrame[16].yRot = -90;
+
+	KeyFrame[17].x = -12.6f;
+	KeyFrame[17].z = 7.3f;
+	KeyFrame[17].yRot = -82;
+
+	KeyFrame[18].x = -14.9f;
+	KeyFrame[18].z = 7.7f;
+	KeyFrame[18].yRot = -73;
+
+	KeyFrame[19].x = -17.7f;
+	KeyFrame[19].z = 8.3f;
+	KeyFrame[19].yRot = -59;
+
+	KeyFrame[20].x = -16.4f;
+	KeyFrame[20].z = 6.6f;
+	KeyFrame[20].yRot = -46;
+
+	KeyFrame[21].x = -12;
+	KeyFrame[21].z = 2;
+	KeyFrame[21].yRot = -46;
+
+	KeyFrame[22].x = -8.5f;
+	KeyFrame[22].z = -0.7f;
+	KeyFrame[22].yRot = -29;
+
+	KeyFrame[23].x = -7.8f;
+	KeyFrame[23].z = 2;
+	KeyFrame[23].yRot = -13;
+
+	KeyFrame[24].x = -7.4f;
+	KeyFrame[24].z = 4.9f;
+	KeyFrame[24].yRot = 17;
+
+	KeyFrame[25].x = -6;
+	KeyFrame[25].z = 6.2f;
+	KeyFrame[25].yRot = 30;
+
+	KeyFrame[26].x = -7.7f;
+	KeyFrame[26].z = 2.9f;
+	KeyFrame[26].yRot = 30;
+
+	KeyFrame[27].x = -5.3f;
+	KeyFrame[27].z = 5.2f;
+	KeyFrame[27].yRot = 52;
+
+	KeyFrame[28].x = -1.3f;
+	KeyFrame[28].z = 7.5f;
+	KeyFrame[28].yRot = 56;
+
+	KeyFrame[29].x = 3.7f;
+	KeyFrame[29].z = 10.8f;
+	KeyFrame[29].yRot = 56;
+
+	KeyFrame[30].x = 6.3f;
+	KeyFrame[30].z = 13.4f;
+	KeyFrame[30].yRot = 46;
+
+	KeyFrame[31].x = 11.2f;
+	KeyFrame[31].z = 18.1f;
+	KeyFrame[31].yRot = 53;
+
+	KeyFrame[32].x = 18.3f;
+	KeyFrame[32].z = 21.5f;
+	KeyFrame[32].yRot = 64;
+
+	KeyFrame[33].x = 31.1f;
+	KeyFrame[33].z = 23.6f;
+	KeyFrame[33].yRot = 74;
+
+	KeyFrame[34].x = 35.6f; 
+	KeyFrame[34].z = 24.3f;
+	KeyFrame[34].yRot = 81;
+
+	KeyFrame[35].x = 41.6f;
+	KeyFrame[35].z = 24;
+	KeyFrame[35].yRot = 90;
+
+	KeyFrame[36].x = 51.6f;
+	KeyFrame[36].z = 24;
+	KeyFrame[36].yRot = 90;
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
@@ -394,17 +664,17 @@ int main()
 	double paso = 3;
 	float t2 = 0,t3 = 0;
 	bool f1 = 1,f2 = 1;
-	bool b1= 1, b2=0, b3=0, b4=0;/*
-	AjusteModelo ajuste = AjusteModelo(5);*/
+	bool b1= 1, b2=0, b3=0, b4=0;
+	AjusteModelo ajuste = AjusteModelo(3);
 
 	//Variables para animaciones
 	variablesAnim avionPar = variablesAnim();
 	variablesAnim cochePar = variablesAnim();
 	variablesAnim audiPar = variablesAnim();
 
-	avionPar.xIni = -15.0f;
-	avionPar.yIni = 7.5f;
-	avionPar.zIni = -8.0f;
+	avionPar.xIni = 9.3f;
+	avionPar.yIni = 9.6f;
+	avionPar.zIni = 6.9f;
 	avionPar.escala = 0.015f;
 	avionPar.rotIni = 0;
 
@@ -447,13 +717,13 @@ int main()
 			if (hora < 1)
 				f2 = 1;
 		}
-		printf("Hora: %i\n", hora);
+		/*printf("Hora: %i\n", hora);*/
 		//Recibir eventos del usuario
 		glfwPollEvents();
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
-		/*ajuste.ajustar(mainWindow.getsKeys());*/
+		ajuste.ajustar(mainWindow.getsKeys());
 
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -495,49 +765,49 @@ int main()
 
 		//Casa
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f,2.0f,0.0f));
-		model = glm::scale(model, glm::vec3(4.0f,4.0f,4.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		casa.RenderModel();
-		
+
 		//Sofa
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(17.78f,2.74f,-16.0f));
-		model = glm::scale(model, glm::vec3(0.21f,0.21f,0.21f));
-		model = glm::rotate(model, 90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(17.78f, 2.74f, -16.0f));
+		model = glm::scale(model, glm::vec3(0.21f, 0.21f, 0.21f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		sofa.RenderModel();
-		
+
 		//Cama 1
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(37.26f,2.82f,6.18f));
-		model = glm::scale(model, glm::vec3(0.30f,0.30f,0.30f));
-		model = glm::rotate(model, -90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		cama.RenderModel();
-		
-		//Cama 2
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(20.20f,2.82f,6.24f));
-		model = glm::scale(model, glm::vec3(0.30f,0.30f,0.30f));
-		model = glm::rotate(model, 90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		cama.RenderModel();
-		
-		//Cama 3
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-18.14f,2.82f,8.74f));
-		model = glm::scale(model, glm::vec3(0.30f,0.30f,0.30f));
-		model = glm::rotate(model, -90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(37.26f, 2.82f, 6.18f));
+		model = glm::scale(model, glm::vec3(0.30f, 0.30f, 0.30f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		cama.RenderModel();
 
-		
+		//Cama 2
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(20.20f, 2.82f, 6.24f));
+		model = glm::scale(model, glm::vec3(0.30f, 0.30f, 0.30f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		cama.RenderModel();
+
+		//Cama 3
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-18.14f, 2.82f, 8.74f));
+		model = glm::scale(model, glm::vec3(0.30f, 0.30f, 0.30f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		cama.RenderModel();
+
+
 		//Cama 4
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-5.48f,2.82f,8.8f));
-		model = glm::scale(model, glm::vec3(0.30f,0.30f,0.30f));
-		model = glm::rotate(model, 90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(-5.48f, 2.82f, 8.8f));
+		model = glm::scale(model, glm::vec3(0.30f, 0.30f, 0.30f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		cama.RenderModel();
 
@@ -670,7 +940,7 @@ int main()
 		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		columna.RenderModel();
-		
+
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(-4.54f, -2.54f, -19.48f));
 		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
@@ -682,7 +952,7 @@ int main()
 		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		columna.RenderModel();
-		
+
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(18.04f, -2.6f, 9.10f));
 		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
@@ -770,7 +1040,7 @@ int main()
 		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		ventana.RenderModel();
-		
+
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(34.58f, 3.32f, 9.52f));
 		model = glm::scale(model, glm::vec3(1.645f, 1.645f, 1.645f));
@@ -831,7 +1101,23 @@ int main()
 		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		cocina.RenderModel();
-	
+
+		//Chico RC
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(18.14f, 2.74f, -6.3f));
+		model = glm::scale(model, glm::vec3(14.0f, 14.0f, 14.0f));
+		model = glm::rotate(model, 190 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		chico.RenderModel();
+
+		//Ellie
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(2.8f, 6.7f, 6.9f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		ellie.RenderModel();
+
 		if (mainWindow.getPlayAnimation()) {
 			if (t2 <= 45 || t2 >= 315) {
 				cochePar.x = cochePar.xIni + 3 * cos(t2 * toRadians)*sqrt(cos(2 * t2* toRadians));
@@ -841,9 +1127,9 @@ int main()
 				if (t2 == 360)
 					t2 = 0;
 			}
-			else if(t2 <= 225) {
-				cochePar.x = cochePar.xIni + 3 * cos(t2* toRadians)*sqrt(cos(2 *t2* toRadians));
-				cochePar.z = cochePar.zIni - 3 * sin(t2* toRadians)*sqrt(cos(2 *t2* toRadians));
+			else if (t2 <= 225) {
+				cochePar.x = cochePar.xIni + 3 * cos(t2* toRadians)*sqrt(cos(2 * t2* toRadians));
+				cochePar.z = cochePar.zIni - 3 * sin(t2* toRadians)*sqrt(cos(2 * t2* toRadians));
 				if (t2 == 225)
 					t2 = 315;
 			}
@@ -852,13 +1138,13 @@ int main()
 				cochePar.zp = 3 * cos(t2*toRadians)*sqrt(cos(2 * toRadians*t2)) - 3 * sin(t2*toRadians)*sin(2 * t2*toRadians) / (sqrt(cos(2 * t2*toRadians)));
 				cochePar.Rot = cochePar.rotIni + atan(cochePar.zp / cochePar.xp);
 			}
-			else if (t2 < 225 ) {
+			else if (t2 < 225) {
 				cochePar.xp = -3 * sin(t2*toRadians)*sqrt(cos(2 * toRadians*t2)) - 3 * cos(t2*toRadians)*sin(2 * t2*toRadians) / (sqrt(cos(2 * t2*toRadians)));
 				cochePar.zp = -3 * cos(t2*toRadians)*sqrt(cos(2 * toRadians*t2)) + 3 * sin(t2*toRadians)*sin(2 * t2*toRadians) / (sqrt(cos(2 * t2*toRadians)));
-				cochePar.Rot =cochePar.rotIni + atan(cochePar.zp / cochePar.xp);
+				cochePar.Rot = cochePar.rotIni + atan(cochePar.zp / cochePar.xp);
 			}
 			if (t2 >= 180 && t2 <= 360) {
-				cochePar.Rot += 180 *toRadians;
+				cochePar.Rot += 180 * toRadians;
 			}
 
 			if (b1 && t3 <= 30) {
@@ -889,28 +1175,39 @@ int main()
 					b1 = 1;
 				}
 			}
-			avionPar.y = avionPar.yIni + 5 * cos(t3*toRadians)*sqrt(cos(3 *t3*toRadians));
-			avionPar.z = avionPar.zIni + 5 * sin(t3*toRadians)*sqrt(cos(3 *t3*toRadians));
+			avionPar.y = avionPar.yIni + 5 * cos(t3*toRadians)*sqrt(cos(3 * t3*toRadians));
+			avionPar.z = avionPar.zIni + 5 * sin(t3*toRadians)*sqrt(cos(3 * t3*toRadians));
 
 			if ((int)t3 % 30 != 0) {
 				avionPar.yp = -5 * sin(t3*toRadians)*sqrt(cos(3 * t3*toRadians)) - (15 / 2)* (cos(t3*toRadians)*sin(3 * t3*toRadians)) / (sqrt(cos(3 * t3*toRadians)));
 				avionPar.zp = 5 * cos(t3*toRadians)*sqrt(cos(3 * t3*toRadians)) - (15 / 2)* (sin(t3*toRadians)*sin(3 * t3*toRadians)) / (sqrt(cos(3 * t3*toRadians)));
 				if (avionPar.zp != 0)
-					avionPar.Rot = avionPar.rotIni + atan(avionPar.yp / avionPar.zp); 
-				/*if ((t3 >= 114.47 && t3 <= 150) || (t3 >= 339.59 && t3 <= 360) || (t3 >= 21 && t3 <= 30) || (t3 >= 210 && t3 <= 245.51)) {
-					avionPar.Rot -= 180 * toRadians;
-				}*/if ((t3 >= 114.47 && t3 <= 150) || (t3 >= 330 && t3 <= 339.59) || (t3 >= 21 && t3 <= 30) || (t3 >= 210 && t3 <= 245.51)) {
+					avionPar.Rot = avionPar.rotIni + atan(avionPar.yp / avionPar.zp);
+				if ((t3 >= 114.47 && t3 <= 150) || (t3 >= 330 && t3 <= 339.59) || (t3 >= 21 && t3 <= 30) || (t3 >= 210 && t3 <= 245.51)) {
 					avionPar.Rot -= 180 * toRadians;
 				}
 			}
 			t3 += 1;
 			t2 += 1;
+
+			play = mainWindow.getPlay();
+
+			animate();
 		}
 		else {
+
 			t2 = 0;
 			t3 = 0;
 		}
-	
+
+		//Audi
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(x, -2.2f, z));
+		model = glm::scale(model, glm::vec3(0.07f, 0.07f, 0.07f));
+		model = glm::rotate(model, (yRot) *toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		audi.RenderModel();
+
 		//Coche de RC
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(cochePar.x, cochePar.yIni, cochePar.z));
@@ -920,16 +1217,17 @@ int main()
 		cocheRC.RenderModel();
 
 
-		//Coche de RC
+		//Coche de Avioncito
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(avionPar.xIni, avionPar.y, avionPar.z));
 		model = glm::scale(model, glm::vec3(avionPar.escala, avionPar.escala, avionPar.escala));
 		model = glm::rotate(model, - avionPar.Rot, glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, 180*toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		avion.RenderModel();
 
 
-		/*model = glm::mat4(1.0);
+		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(ajuste.getX(), ajuste.getY(), ajuste.getZ()));
 		model = glm::scale(model, glm::vec3(ajuste.getEscala(), ajuste.getEscala(), ajuste.getEscala()));
 		model = glm::rotate(model, ajuste.getRotacion()*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -939,20 +1237,14 @@ int main()
 			audi.RenderModel();
 			break;
 		case 1:
-			avion.RenderModel();
+			ellie.RenderModel();
 			break;
 		case 2:
-			cocheRC.RenderModel();
-			break;
-		case 3:
 			balon.RenderModel();
-			break;
-		case 4:
-			toalla.RenderModel();
 			break;
 		default:
 			break;
-		}*/
+		}
 
 
 
