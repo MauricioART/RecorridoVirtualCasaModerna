@@ -112,6 +112,7 @@ Model audi;
 Model balon;
 Model chico;
 Model ellie;
+Model avatar;
 
 ///////////////////////////////KEYFRAMES/////////////////////
 
@@ -123,7 +124,7 @@ bool animacion = false;
 //NEW// Keyframes
 
 #define MAX_FRAMES 100
-int i_max_steps = 20;
+int i_max_steps = 15;
 int i_curr_steps = 0;
 typedef struct _frame
 {
@@ -133,7 +134,7 @@ typedef struct _frame
 }FRAME;
 
 FRAME KeyFrame[MAX_FRAMES];
-int FrameIndex = 37;			//introducir datos
+int FrameIndex = 38;			//introducir datos
 bool play = true;
 int playIndex = 0;
 
@@ -154,11 +155,10 @@ float xIni, zIni, yRotIni;
 
 void resetElements(void) //Tecla 0
 {
-
 	x = KeyFrame[0].x;
 	z = KeyFrame[0].z;
 	yRot = KeyFrame[0].yRot;
-	
+	printf("Hi im reseting x, z and yRot to %2f,%2f,%2f",x,z,yRot );
 }
 
 void interpolation(void)
@@ -171,30 +171,34 @@ void interpolation(void)
 	/*printf("(xInc,zInc,yRotInc)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].xInc, KeyFrame[playIndex].zInc, KeyFrame[playIndex].yRotInc);*/
 }
 
-
+bool firstTime = 1,interpolationDone = 0;
 void animate(void)
 {
 	//Movimiento del objeto // barra espaciadora
 	if (play)
 	{
-		/*if (firstTime)
-			interpolation();*/
+		if (firstTime) {
+			firstTime = 0;
+			interpolation();
+		}
 		if (i_curr_steps >= i_max_steps) //end of animation between frames?
 		{
-			if (playIndex > FrameIndex - 2)	//end of total animation?
+			if (playIndex >= FrameIndex - 1)	//end of total animation?
 			{
 				printf("Frame index= %d\n", FrameIndex);
 				printf("termina anim\n");
-				playIndex = 0;
+				playIndex = -2;
 				play = false;
 				resetElements();
+				interpolationDone = 1;
 			}
 			else //Next frame interpolations
-			{
+			{	
 				//printf("entro aquí\n");
 				i_curr_steps = 0; //Reset counter
 				//Interpolation
-				interpolation();
+				if(!interpolationDone)
+					interpolation();
 			}
 			playIndex++;
 		}
@@ -207,9 +211,9 @@ void animate(void)
 			z += KeyFrame[playIndex-1].zInc;
 			yRot += KeyFrame[playIndex-1].yRotInc;
 			i_curr_steps++;
-			printf("playIndez = %d\n", playIndex);
-			printf("(x,z,yRot)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].x, KeyFrame[playIndex].z, KeyFrame[playIndex].yRot);
-			printf("(xInc,zInc,yRotInc)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].xInc, KeyFrame[playIndex].zInc, KeyFrame[playIndex].yRotInc);
+			printf("playIndex = %d\n", playIndex);
+			printf("(x,z,yRot)->(%3f,%3f,%3f)\n", x, z, yRot);/*
+			printf("(xInc,zInc,yRotInc)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].xInc, KeyFrame[playIndex].zInc, KeyFrame[playIndex].yRotInc);*/
 
 		}
 
@@ -317,7 +321,7 @@ int main()
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.2f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 1.215f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.2f, 0.5f);
 
 	// INICIAÑIZACIÓN DE TEXTURAS
 	pisoTexture = Texture("Textures/Piso.jpg");
@@ -425,6 +429,7 @@ int main()
 	balon = Model();
 	chico = Model();
 	ellie = Model();
+	avatar = Model();
 
 	casa.LoadModel("Models/Casa.obj");
 	sofa.LoadModel("Models/Sofa.obj");
@@ -450,6 +455,7 @@ int main()
 	balon.LoadModel("Models/Balon.obj");
 	chico.LoadModel("Models/Guy1.obj");
 	ellie.LoadModel("Models/Ellie.obj");
+	avatar.LoadModel("Models/TorsoRobotS.obj");
 
 	std::string skyboxPath = "Textures/Skybox/";
 	std::string skyboxPathBuf = "Textures/Skybox/";
@@ -655,6 +661,11 @@ int main()
 	KeyFrame[36].z = 24;
 	KeyFrame[36].yRot = 90;
 
+	KeyFrame[37].x = 42.7f;
+	KeyFrame[37].z = 22.9f;
+	KeyFrame[37].yRot = -90;
+	
+
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 300.0f);
@@ -686,11 +697,11 @@ int main()
 
 	float t = 0.0f;
 	float w = 15, w2 = 20;
-
+	float avatarRot, avatarFrontX,avatarFrontZ;
+	
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
-
 		GLfloat now = glfwGetTime();
 		deltaTime = now - lastTime;
 		deltaTime += (now - lastTime) / limitFPS;
@@ -728,7 +739,12 @@ int main()
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		skybox[hora].DrawSkybox(camera.calculateViewMatrix(), projection);
+
+		if(camera.getTipoCamara())
+			skybox[hora].DrawSkybox(camera.calculateViewMatrix3p(), projection);
+		else
+			skybox[hora].DrawSkybox(camera.calculateViewMatrix(), projection);
+
 		shaderList[0].UseShader();
 		uniformModel = shaderList[0].GetModelLocation();
 		uniformProjection = shaderList[0].GetProjectionLocation();
@@ -740,9 +756,14 @@ int main()
 		uniformShininess = shaderList[0].GetShininessLocation();
 
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
-		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-
+		if (camera.getTipoCamara()) {
+			glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix3p()));
+			glUniform3f(uniformEyePosition, camera.getCameraPosition3p().x, camera.getCameraPosition3p().y, camera.getCameraPosition3p().z);
+		}
+		else {
+			glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
+			glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+		}
 
 
 		//información al shader de fuentes de iluminación
@@ -762,6 +783,21 @@ int main()
 		//agregar material al plano de piso
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		meshList[0]->RenderMesh();
+
+		//Avatar 
+		model = glm::mat4(1.0);
+		model = glm::translate(model,camera.getCameraPosition() + glm::vec3(0.0f,-1.215f,0.0f));
+		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
+		avatarFrontX = camera.getCameraDirection().x;
+		avatarFrontZ = camera.getCameraDirection().z;
+		if (avatarFrontZ != 0)
+			avatarRot = atan(avatarFrontX / avatarFrontZ);
+		if (avatarFrontZ > 0 )
+			avatarRot += 180 * toRadians;
+		model = glm::rotate(model, avatarRot + 90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		avatar.RenderModel();
+
 
 		//Casa
 		model = glm::mat4(1.0);
@@ -1227,14 +1263,16 @@ int main()
 		avion.RenderModel();
 
 
-		model = glm::mat4(1.0);
+		/*model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(ajuste.getX(), ajuste.getY(), ajuste.getZ()));
 		model = glm::scale(model, glm::vec3(ajuste.getEscala(), ajuste.getEscala(), ajuste.getEscala()));
 		model = glm::rotate(model, ajuste.getRotacion()*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		materialGris.LoadTexture();
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		switch (ajuste.getModelo()) {
 		case 0:
-			audi.RenderModel();
+			avatar.RenderModel();
 			break;
 		case 1:
 			ellie.RenderModel();
@@ -1244,9 +1282,14 @@ int main()
 			break;
 		default:
 			break;
+		}*/
+
+		if (playIndex == 37) {
+			for (int i = 0; i < 37; i++) {
+				printf("KeyFrameInc[%i]->(%3f,%3f,%3f)\n", i,KeyFrame[i].xInc, KeyFrame[i].zInc, KeyFrame[i].yRotInc);
+			}
+			
 		}
-
-
 
 
 

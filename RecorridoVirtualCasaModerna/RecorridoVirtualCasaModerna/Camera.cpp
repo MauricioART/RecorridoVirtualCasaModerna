@@ -4,6 +4,7 @@ Camera::Camera() {}
 
 Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed)
 {
+	tipoCamara = 0;
 	position = startPosition;
 	worldUp = startUp;
 	yaw = startYaw;
@@ -32,6 +33,12 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 	if (keys[GLFW_KEY_S])
 	{
 		position -= glm::vec3(front.x, 0.0f, front.z) * velocity;
+	}
+	if (keys[GLFW_KEY_1]) {
+		if (tipoCamara)
+			tipoCamara = 0;
+		else
+			tipoCamara = 1;
 	}
 
 	if (keys[GLFW_KEY_A])
@@ -79,9 +86,23 @@ glm::mat4 Camera::calculateViewMatrix()
 	return glm::lookAt(position, position + front, up);
 }
 
+glm::mat4 Camera::calculateViewMatrix3p()
+{
+	glm::vec3 frontBuffer = glm::normalize(front);
+	position3p = position - glm::vec3(2*frontBuffer.x, -0.5f, 2*frontBuffer.z);
+	return glm::lookAt( position3p,  position3p + front, up);
+	//return glm::lookAt( position3p,  glm::vec3(frontBuffer.x, -0.5f, frontBuffer.z), up);
+}
+
 glm::vec3 Camera::getCameraPosition()
 {
 	return position;
+}
+glm::vec3 Camera::getCameraPosition3p()
+{
+	glm::vec3 frontBuffer = glm::normalize(front);
+	position3p = position - glm::vec3(2 * frontBuffer.x, -0.5f, 2 * frontBuffer.z);
+	return position3p;
 }
 
 
