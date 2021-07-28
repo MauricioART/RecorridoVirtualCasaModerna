@@ -164,9 +164,9 @@ void resetElements(void) //Tecla 0
 void interpolation(void)
 {
  	for(int i = 0; i < FrameIndex - 1; i++){
-		KeyFrame[playIndex].xInc = (KeyFrame[playIndex + 1].x - KeyFrame[playIndex].x) / i_max_steps;
-		KeyFrame[playIndex].zInc = (KeyFrame[playIndex + 1].z - KeyFrame[playIndex].z) / i_max_steps;
-		KeyFrame[playIndex].yRotInc = (KeyFrame[playIndex + 1].yRot - KeyFrame[playIndex].yRot) / i_max_steps;
+		KeyFrame[i].xInc = (KeyFrame[i + 1].x - KeyFrame[i].x) / i_max_steps;
+		KeyFrame[i].zInc = (KeyFrame[i + 1].z - KeyFrame[i].z) / i_max_steps;
+		KeyFrame[i].yRotInc = (KeyFrame[i + 1].yRot - KeyFrame[i].yRot) / i_max_steps;
 	}
 	KeyFrame[FrameIndex - 1].xInc = (KeyFrame[0].x - KeyFrame[FrameIndex - 1].x) / i_max_steps;
 	KeyFrame[FrameIndex - 1].zInc = (KeyFrame[0].z - KeyFrame[FrameIndex - 1].z) / i_max_steps;
