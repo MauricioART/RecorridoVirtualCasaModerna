@@ -1,6 +1,6 @@
 /*
 Semestre 2021-2
-Práctica : Iluminación
+PrÃ¡ctica : IluminaciÃ³n
 Cambios en el shader, en lugar de enviar la textura en el shader de fragmentos, enviaremos el finalcolor
 */
 //para cargar imagen
@@ -32,7 +32,7 @@ Cambios en el shader, en lugar de enviar la textura en el shader de fragmentos, 
 #include "Skybox.h"
 #include "AjusteModelo.h"
 
-//para iluminación
+//para iluminaciÃ³n
 #include "CommonValues.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
@@ -162,58 +162,42 @@ void resetElements(void) //Tecla 0
 }
 
 void interpolation(void)
-{/*
-	printf("Hola estoy en el playIndex: &i\n", playIndex);*/
-	KeyFrame[playIndex].xInc = (KeyFrame[playIndex + 1].x - KeyFrame[playIndex].x) / i_max_steps;
-	KeyFrame[playIndex].zInc = (KeyFrame[playIndex + 1].z - KeyFrame[playIndex].z) / i_max_steps;
-	KeyFrame[playIndex].yRotInc = (KeyFrame[playIndex + 1].yRot - KeyFrame[playIndex].yRot) / i_max_steps;
-
-	/*printf("(xInc,zInc,yRotInc)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].xInc, KeyFrame[playIndex].zInc, KeyFrame[playIndex].yRotInc);*/
+{
+ 	for(int i = 0; i < FrameIndex - 1; i++){
+		KeyFrame[playIndex].xInc = (KeyFrame[playIndex + 1].x - KeyFrame[playIndex].x) / i_max_steps;
+		KeyFrame[playIndex].zInc = (KeyFrame[playIndex + 1].z - KeyFrame[playIndex].z) / i_max_steps;
+		KeyFrame[playIndex].yRotInc = (KeyFrame[playIndex + 1].yRot - KeyFrame[playIndex].yRot) / i_max_steps;
+	}
+	KeyFrame[FrameIndex - 1].xInc = (KeyFrame[0].x - KeyFrame[FrameIndex - 1].x) / i_max_steps;
+	KeyFrame[FrameIndex - 1].zInc = (KeyFrame[0].z - KeyFrame[FrameIndex - 1].z) / i_max_steps;
+	KeyFrame[FrameIndex - 1].yRotInc = (KeyFrame[0].yRot - KeyFrame[FrameIndex - 1].yRot) / i_max_steps;
 }
 
-bool firstTime = 1,interpolationDone = 0;
 void animate(void)
 {
 	//Movimiento del objeto // barra espaciadora
 	if (play)
 	{
-		if (firstTime) {
-			firstTime = 0;
-			interpolation();
-		}
 		if (i_curr_steps >= i_max_steps) //end of animation between frames?
-		{
-			if (playIndex >= FrameIndex - 1)	//end of total animation?
+		{	
+			i_curr_steps = 0;
+			if (playIndex > FrameIndex - 1)	//end of total animation?
 			{
-				printf("Frame index= %d\n", FrameIndex);
-				printf("termina anim\n");
-				playIndex = -2;
-				play = false;
-				resetElements();
-				interpolationDone = 1;
+				playIndex = 0;
+				//play = false;
 			}
 			else //Next frame interpolations
 			{	
-				//printf("entro aquí\n");
-				i_curr_steps = 0; //Reset counter
-				//Interpolation
-				if(!interpolationDone)
-					interpolation();
+				playIndex++;
 			}
-			playIndex++;
+			
 		}
 		else
 		{
-			//printf("se quedó aqui\n");
-			//printf("max steps: %f", i_max_steps);
-			//Draw animation
-			x += KeyFrame[playIndex-1].xInc;
-			z += KeyFrame[playIndex-1].zInc;
-			yRot += KeyFrame[playIndex-1].yRotInc;
+			x += KeyFrame[playIndex].xInc;
+			z += KeyFrame[playIndex].zInc;
+			yRot += KeyFrame[playIndex].yRotInc;
 			i_curr_steps++;
-			printf("playIndex = %d\n", playIndex);
-			printf("(x,z,yRot)->(%3f,%3f,%3f)\n", x, z, yRot);/*
-			printf("(xInc,zInc,yRotInc)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].xInc, KeyFrame[playIndex].zInc, KeyFrame[playIndex].yRotInc);*/
 
 		}
 
@@ -253,7 +237,7 @@ static const char* vShader = "shaders/shader_light.vert";
 static const char* fShader = "shaders/shader_light.frag";
 
 
-//cálculo del promedio de las normales para sombreado de Phong
+//cÃ¡lculo del promedio de las normales para sombreado de Phong
 void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloat * vertices, unsigned int verticeCount,
 	unsigned int vLength, unsigned int normalOffset)
 {
@@ -323,7 +307,7 @@ int main()
 
 	camera = Camera(glm::vec3(0.0f, 1.215f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.2f, 0.5f);
 
-	// INICIAÑIZACIÓN DE TEXTURAS
+	// INICIAÃ‘IZACIÃ“N DE TEXTURAS
 	pisoTexture = Texture("Textures/Piso.jpg");
 	materialBlanco = Texture("Textures/BlancoPuro.png");
 	materialDorado = Texture("Textures/Dorado.png");
@@ -402,7 +386,7 @@ int main()
 	mochila.LoadTexture();
 	cafe.LoadTexture();
 
-	// INICIALIZACIÓN DE MODELOS
+	// INICIALIZACIÃ“N DE MODELOS
 
 	casa = Model();
 	sofa = Model();
@@ -484,13 +468,13 @@ int main()
 
 	
 
-	// INICIALIZACIÓN MATERIALES
+	// INICIALIZACIÃ“N MATERIALES
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
 
 
 	
-	//luz direccional, sólo 1 y siempre debe de existir
+	//luz direccional, sÃ³lo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
 		0.5f, 0.3f,
 		0.0f, 0.0f, -1.0f);
@@ -665,6 +649,9 @@ int main()
 	KeyFrame[37].z = 22.9f;
 	KeyFrame[37].yRot = -90;
 	
+	// Interá¹•olaciÃ³n (AnimaciÃ³n Coche)
+	interpolacion();
+	
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
@@ -751,7 +738,7 @@ int main()
 		uniformView = shaderList[0].GetViewLocation();
 		uniformEyePosition = shaderList[0].GetEyePositionLocation();
 
-		//información en el shader de intensidad especular y brillo
+		//informaciÃ³n en el shader de intensidad especular y brillo
 		uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
 		uniformShininess = shaderList[0].GetShininessLocation();
 
@@ -766,7 +753,7 @@ int main()
 		}
 
 
-		//información al shader de fuentes de iluminación
+		//informaciÃ³n al shader de fuentes de iluminaciÃ³n
 		shaderList[0].SetDirectionalLight(&mainLight);
 		shaderList[0].SetPointLights(pointLights, pointLightCount);
 		shaderList[0].SetSpotLights(spotLights, spotLightCount);
@@ -870,7 +857,7 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		comedor.RenderModel();
 
-		//Muebles baño
+		//Muebles baÃ±o
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(9.22f, 2.72f, -8.5f));
 		model = glm::scale(model, glm::vec3(1.9f, 1.9f, 1.9f));
