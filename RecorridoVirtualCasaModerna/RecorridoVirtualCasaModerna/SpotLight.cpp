@@ -45,6 +45,9 @@ void SpotLight::SetFlash(glm::vec3 pos, glm::vec3 dir)
 	position = pos;
 	direction = dir;
 }
+void SpotLight::SetDir(glm::vec3 dir) {
+	direction = dir;
+}
 
 void SpotLight::SetPos(glm::vec3 pos)
 {

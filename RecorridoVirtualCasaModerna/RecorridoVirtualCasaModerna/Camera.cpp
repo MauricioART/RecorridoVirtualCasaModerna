@@ -5,6 +5,7 @@ Camera::Camera() {}
 Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLfloat startPitch, GLfloat startMoveSpeed, GLfloat startTurnSpeed)
 {
 	tipoCamara = 0;
+	show = 0;
 	position = startPosition;
 	worldUp = startUp;
 	yaw = startYaw;
@@ -35,12 +36,12 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		position -= glm::vec3(front.x, 0.0f, front.z) * velocity;
 	}
 	if (keys[GLFW_KEY_1]) {
-		if (tipoCamara)
-			tipoCamara = 0;
-		else
-			tipoCamara = 1;
+		tipoCamara = 1;
 	}
-
+	if (keys[GLFW_KEY_2]) {
+		tipoCamara = 0;
+	}
+	
 	if (keys[GLFW_KEY_A])
 	{
 		position -= glm::vec3(right.x, 0.0f, right.z) * velocity;
@@ -51,14 +52,21 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 		position += glm::vec3(right.x, 0.0f, right.z) * velocity;
 	}
 	if (keys[GLFW_KEY_SPACE]) {
-		if (position.y <= 5.5)
+		if (position.y <= 5.25)
 		position += glm::vec3(front.x, 0.0f, front.z) * velocity + glm::vec3(0.0f, 0.2f, 0.0f);
 	}
 	if (keys[GLFW_KEY_F]) {
-		if (position.y >= 0.2)
+		if (position.y >= 0.95)
 			position -= glm::vec3(front.x, 0.0f, front.z) * velocity + glm::vec3(0.0f, 0.2f, 0.0f);
 	}
+	if (keys[GLFW_KEY_L]) {
+		show = 1;
+	}
+	if (keys[GLFW_KEY_K]) {
+		show = 0;
+	}
 }
+
 
 void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 {
@@ -81,6 +89,17 @@ void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 	update();
 }
 
+bool Camera::doesItMove() {
+	if ( lastPosition == position) 
+		return 0;
+	else
+		return 1;
+
+}
+void Camera::setLastPosition(glm::vec3 pos) {
+	lastPosition = pos;
+}
+
 glm::mat4 Camera::calculateViewMatrix()
 {
 	return glm::lookAt(position, position + front, up);
@@ -89,7 +108,7 @@ glm::mat4 Camera::calculateViewMatrix()
 glm::mat4 Camera::calculateViewMatrix3p()
 {
 	glm::vec3 frontBuffer = glm::normalize(front);
-	position3p = position - glm::vec3(2*frontBuffer.x, -0.5f, 2*frontBuffer.z);
+	position3p = position - glm::vec3(4*frontBuffer.x, -0.5f, 4*frontBuffer.z);
 	return glm::lookAt( position3p,  position3p + front, up);
 	//return glm::lookAt( position3p,  glm::vec3(frontBuffer.x, -0.5f, frontBuffer.z), up);
 }
@@ -101,7 +120,7 @@ glm::vec3 Camera::getCameraPosition()
 glm::vec3 Camera::getCameraPosition3p()
 {
 	glm::vec3 frontBuffer = glm::normalize(front);
-	position3p = position - glm::vec3(2 * frontBuffer.x, -0.5f, 2 * frontBuffer.z);
+	position3p = position - glm::vec3(4* frontBuffer.x, -0.5f, 4 * frontBuffer.z);
 	return position3p;
 }
 

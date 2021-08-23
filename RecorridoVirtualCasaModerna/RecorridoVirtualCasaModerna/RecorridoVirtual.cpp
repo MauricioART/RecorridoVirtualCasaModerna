@@ -42,6 +42,7 @@ const float toRadians = 3.14159265f / 180.0f;
 const float pi = 3.14159265f;
 
 
+
 Window mainWindow;
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
@@ -87,6 +88,12 @@ Texture mochila;
 Texture cafe;
 Texture rojoEllie;
 Texture gray;
+Texture bosque;
+Texture cuadroT;
+Texture arbusto;
+Texture pinoHojas;
+Texture pintoRamas;
+
 
 Model casa;
 Model sofa;
@@ -112,8 +119,24 @@ Model audi;
 Model balon;
 Model chico;
 Model ellie;
-Model avatar;
-
+Model avatarTorso;
+Model avatarPiernaInf;
+Model avatarPiernaSupIzq;
+Model avatarPiernaSupDer;
+Model avatarBrazoIzq;
+Model avatarBrazoDer;
+Model Robot;
+Model lampara;
+Model arbol;
+Model pino;
+Model cuadro;
+Model cuadro1;
+Model cuadro2;
+Model cuadro3;
+Model pasto;
+Model llantas;
+Model luzPF;
+Model luzPM;
 ///////////////////////////////KEYFRAMES/////////////////////
 
 
@@ -124,7 +147,7 @@ bool animacion = false;
 //NEW// Keyframes
 
 #define MAX_FRAMES 100
-int i_max_steps = 15;
+int i_max_steps = 30;
 int i_curr_steps = 0;
 typedef struct _frame
 {
@@ -133,23 +156,12 @@ typedef struct _frame
 
 }FRAME;
 
+
 FRAME KeyFrame[MAX_FRAMES];
 int FrameIndex = 38;			//introducir datos
 bool play = true;
 int playIndex = 0;
 
-//void saveFrame(void) //tecla L
-//{
-//
-//	printf("frameindex %d\n", FrameIndex);
-//
-//
-//	KeyFrame[FrameIndex].movAvion_x = movAvion_x;
-//	KeyFrame[FrameIndex].movAvion_y = movAvion_y;
-//	KeyFrame[FrameIndex].giroAvion;
-//	//no volatil, agregar una forma de escribir a un archivo para guardar los frames
-//	FrameIndex++;
-//}
 float x, z, yRot;
 float xIni, zIni, yRotIni;
 
@@ -158,18 +170,16 @@ void resetElements(void) //Tecla 0
 	x = KeyFrame[0].x;
 	z = KeyFrame[0].z;
 	yRot = KeyFrame[0].yRot;
-	printf("Hi im reseting x, z and yRot to %2f,%2f,%2f",x,z,yRot );
+	
 }
 
 void interpolation(void)
-{/*
-	printf("Hola estoy en el playIndex: &i\n", playIndex);*/
+{
 	KeyFrame[playIndex].xInc = (KeyFrame[playIndex + 1].x - KeyFrame[playIndex].x) / i_max_steps;
 	KeyFrame[playIndex].zInc = (KeyFrame[playIndex + 1].z - KeyFrame[playIndex].z) / i_max_steps;
 	KeyFrame[playIndex].yRotInc = (KeyFrame[playIndex + 1].yRot - KeyFrame[playIndex].yRot) / i_max_steps;
-
-	/*printf("(xInc,zInc,yRotInc)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].xInc, KeyFrame[playIndex].zInc, KeyFrame[playIndex].yRotInc);*/
 }
+
 
 bool firstTime = 1,interpolationDone = 0;
 void animate(void)
@@ -185,8 +195,7 @@ void animate(void)
 		{
 			if (playIndex >= FrameIndex - 1)	//end of total animation?
 			{
-				printf("Frame index= %d\n", FrameIndex);
-				printf("termina anim\n");
+				
 				playIndex = -2;
 				play = false;
 				resetElements();
@@ -194,7 +203,6 @@ void animate(void)
 			}
 			else //Next frame interpolations
 			{	
-				//printf("entro aquí\n");
 				i_curr_steps = 0; //Reset counter
 				//Interpolation
 				if(!interpolationDone)
@@ -204,21 +212,98 @@ void animate(void)
 		}
 		else
 		{
-			//printf("se quedó aqui\n");
-			//printf("max steps: %f", i_max_steps);
 			//Draw animation
 			x += KeyFrame[playIndex-1].xInc;
 			z += KeyFrame[playIndex-1].zInc;
 			yRot += KeyFrame[playIndex-1].yRotInc;
 			i_curr_steps++;
-			printf("playIndex = %d\n", playIndex);
-			printf("(x,z,yRot)->(%3f,%3f,%3f)\n", x, z, yRot);/*
-			printf("(xInc,zInc,yRotInc)->(%3f,%3f,%3f)\n", KeyFrame[playIndex].xInc, KeyFrame[playIndex].zInc, KeyFrame[playIndex].yRotInc);*/
-
 		}
 
 	}
 }
+
+//Interpolacion para Avatar
+int i_max_stepsAv = 6;
+int i_curr_stepsAv = 0;
+typedef struct _frameInfo
+{
+	float rotBI, rotBD, rotPSI, rotPSD, rotPID, rotPII;
+	float IncRotBI, IncRotBD, IncRotPSI, IncRotPSD, IncRotPID, IncRotPII;
+
+}FRAMEAv;
+
+
+FRAMEAv KeyFrameAv[MAX_FRAMES];
+int FrameIndexAv = 9;	
+int playIndexAv = 0;
+
+float rotBI, rotBD, rotPSI, rotPSD, rotPID, rotPII;
+
+void resetElementsAvatar(void) //Tecla 0
+{
+	rotBD  = KeyFrameAv[0].rotBD;
+	rotBI  = KeyFrameAv[0].rotBI;
+	rotPSI = KeyFrameAv[0].rotPSI;
+	rotPSD = KeyFrameAv[0].rotPSD;
+	rotPII = KeyFrameAv[0].rotPII;
+	rotPID = KeyFrameAv[0].rotPID;
+
+}
+
+void interpolationAvatar(void)
+{
+	for (int i = 0; i < FrameIndexAv - 1; i++) {
+		KeyFrameAv[i].IncRotBD = (KeyFrameAv [i + 1].rotBD -  KeyFrameAv[i].rotBD) / i_max_stepsAv;
+		KeyFrameAv[i].IncRotBI = (KeyFrameAv [i + 1].rotBI -  KeyFrameAv[i].rotBI) / i_max_stepsAv;
+		KeyFrameAv[i].IncRotPSI = (KeyFrameAv[i + 1].rotPSI - KeyFrameAv[i].rotPSI) / i_max_stepsAv;
+		KeyFrameAv[i].IncRotPSD = (KeyFrameAv[i + 1].rotPSD - KeyFrameAv[i].rotPSD) / i_max_stepsAv;
+		KeyFrameAv[i].IncRotPII = (KeyFrameAv[i + 1].rotPII - KeyFrameAv[i].rotPII) / i_max_stepsAv;
+		KeyFrameAv[i].IncRotPID = (KeyFrameAv[i + 1].rotPID - KeyFrameAv[i].rotPID) / i_max_stepsAv;
+	}
+	KeyFrameAv[FrameIndexAv - 1].IncRotBD = (KeyFrameAv[0].rotBD -   KeyFrameAv[FrameIndexAv - 1].rotBD) / i_max_stepsAv;
+	KeyFrameAv[FrameIndexAv - 1].IncRotBI = (KeyFrameAv[0].rotBI -   KeyFrameAv[FrameIndexAv - 1].rotBI) / i_max_stepsAv;
+	KeyFrameAv[FrameIndexAv - 1].IncRotPSI = (KeyFrameAv[0].rotPSI - KeyFrameAv[FrameIndexAv - 1].rotPSI) / i_max_stepsAv;
+	KeyFrameAv[FrameIndexAv - 1].IncRotPSD = (KeyFrameAv[0].rotPSD - KeyFrameAv[FrameIndexAv - 1].rotPSD) / i_max_stepsAv;
+	KeyFrameAv[FrameIndexAv - 1].IncRotPII = (KeyFrameAv[0].rotPII - KeyFrameAv[FrameIndexAv - 1].rotPII) / i_max_stepsAv;
+	KeyFrameAv[FrameIndexAv - 1].IncRotPID = (KeyFrameAv[0].rotPID - KeyFrameAv[FrameIndexAv - 1].rotPID) / i_max_stepsAv;
+
+}
+
+
+void animateAvatar(bool playAv)
+{
+	//Movimiento del objeto // barra espaciadora
+	if (playAv)
+	{
+		
+		if (i_curr_stepsAv >= i_max_stepsAv) //end of animation between frames?
+		{
+			i_curr_stepsAv = 0;
+			if (playIndexAv >= FrameIndexAv - 1)	//end of total animation?
+			{
+				playIndexAv = 0;
+				//playAv = false;
+			}
+			else //Next frame interpolations
+			{
+				playIndexAv++;
+			}
+		}
+		else
+		{
+			//Draw animation
+			rotBD  += KeyFrameAv[playIndexAv].IncRotBD;
+			rotBI  += KeyFrameAv[playIndexAv].IncRotBI;
+			rotPSI += KeyFrameAv[playIndexAv].IncRotPSI;
+			rotPSD += KeyFrameAv[playIndexAv].IncRotPSD; 
+			rotPII += KeyFrameAv[playIndexAv].IncRotPII; 
+			rotPID += KeyFrameAv[playIndexAv].IncRotPID; 
+			i_curr_stepsAv++;
+		}
+
+	}
+}
+
 
 ///////////////* FIN KEYFRAMES*////////////////////////////
 
@@ -230,7 +315,10 @@ Material Material_brillante;
 Material Material_opaco;
 
 //luz direccional
-DirectionalLight mainLight;
+DirectionalLight sunsetLight;
+DirectionalLight dayLight;
+DirectionalLight nightLight;
+
 //para declarar varias luces de tipo pointlight
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
@@ -321,7 +409,7 @@ int main()
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 1.215f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.2f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 0.95f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.05f, 0.5f);
 
 	// INICIAÑIZACIÓN DE TEXTURAS
 	pisoTexture = Texture("Textures/Piso.jpg");
@@ -362,6 +450,11 @@ int main()
 	cafe = Texture("Textures/Cafe.png");
 	rojoEllie = Texture("Textures/RojoEllie.png");
 	gray = Texture("Textures/Gray.png");
+	bosque = Texture("Textures/Forest3.tga");
+	cuadroT = Texture("Textures/Paintingm.jpg");
+	arbusto	   = Texture("Textures/free_grass.png");
+	pinoHojas = Texture("Textures/pine-leaf-diff.png");
+	pintoRamas = Texture("Textures/pine-branch-diff.png");
 
 	pisoTexture.LoadTexture();
 	materialBlanco.LoadTexture();
@@ -401,6 +494,12 @@ int main()
 	rojoEllie.LoadTexture();
 	mochila.LoadTexture();
 	cafe.LoadTexture();
+	bosque.LoadTexture();
+	cuadroT.LoadTexture();
+	arbusto.LoadTexture();
+	pinoHojas.LoadTexture();
+	pintoRamas.LoadTexture();
+
 
 	// INICIALIZACIÓN DE MODELOS
 
@@ -429,7 +528,24 @@ int main()
 	balon = Model();
 	chico = Model();
 	ellie = Model();
-	avatar = Model();
+	avatarTorso = Model();
+	avatarPiernaInf = Model();
+	avatarPiernaSupDer = Model();
+	avatarPiernaSupIzq = Model();
+	avatarBrazoDer = Model();
+	avatarBrazoIzq = Model();
+	Robot = Model();
+	lampara = Model();
+	arbol = Model();
+	pino = Model();
+	cuadro = Model();
+	cuadro1 = Model();
+	cuadro2 = Model();
+	cuadro3 = Model();
+	pasto = Model();
+	llantas = Model();
+	luzPF = Model();
+	luzPM = Model();
 
 	casa.LoadModel("Models/Casa.obj");
 	sofa.LoadModel("Models/Sofa.obj");
@@ -455,7 +571,24 @@ int main()
 	balon.LoadModel("Models/Balon.obj");
 	chico.LoadModel("Models/Guy1.obj");
 	ellie.LoadModel("Models/Ellie.obj");
-	avatar.LoadModel("Models/TorsoRobotS.obj");
+	avatarTorso.LoadModel("Models/TorsoAvatar.obj");
+	avatarPiernaSupDer.LoadModel("Models/PiernaSupDer.obj");
+	avatarPiernaInf.LoadModel("Models/PiernaInf.obj");
+	avatarPiernaSupIzq.LoadModel("Models/PiernaSupIzq.obj");
+	avatarBrazoDer.LoadModel("Models/BrazoDer.obj");
+	avatarBrazoIzq.LoadModel("Models/BrazoIzq.obj");
+	Robot.LoadModel("Models/RobotCompleto.obj");
+	lampara.LoadModel("Models/LamparaSV.obj");
+	arbol.LoadModel("Models/Arbol.obj");
+	pino.LoadModel("Models/PinoS.obj");
+	cuadro1.LoadModel("Models/Cuadro1.obj");
+	cuadro2.LoadModel("Models/Cuadro2.obj");
+	cuadro3.LoadModel("Models/Cuadro3.obj");
+	cuadro.LoadModel("Models/Cuadro.obj");
+	pasto.LoadModel("Models/Pasto.obj");
+	llantas.LoadModel("Models/Llantas.obj");
+	luzPF.LoadModel("Models/LucesNoMovil.obj");
+	luzPM.LoadModel("Models/LuzMovil.obj");
 
 	std::string skyboxPath = "Textures/Skybox/";
 	std::string skyboxPathBuf = "Textures/Skybox/";
@@ -464,7 +597,7 @@ int main()
 	Shader* skyShader = new Shader();
 	skyShader->CreateFromFiles("shaders/skybox.vert", "shaders/skybox.frag");
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 11; i++) {
 
 		skyboxFaces.push_back(skyboxPath.append("Right").append(std::to_string(i)).append(".jpg"));
 		skyboxPath = skyboxPathBuf;
@@ -491,24 +624,68 @@ int main()
 
 	
 	//luz direccional, sólo 1 y siempre debe de existir
-	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
+	sunsetLight = DirectionalLight(1.0f, 1.0f, 1.0f,
 		0.5f, 0.3f,
 		0.0f, 0.0f, -1.0f);
+	dayLight = DirectionalLight(1.0f, 1.0f, 1.0f,
+		0.55f, 0.3f,
+		0.0f, -0.8f, 0.8f);
+	nightLight = DirectionalLight(1.0f, 1.0f, 1.0f,
+		0.2f, 0.1f,
+		0.0f, -1.0f, 0.0f);
+
 	//contador de luces puntuales
 	unsigned int pointLightCount = 0;
 
 	unsigned int spotLightCount = 0;
 	
-	//linterna
-	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
-		0.0f, 1.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 0.0f,
+
+	//Luces
+	pointLights[0] = PointLight(1.0f, 1.0f, 1.0f,
+		0.4f, 0.5f,
+		28.75f,6.45f,1.1f,
+		0.3f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[1] = PointLight(1.0f, 1.0f, 1.0f,
+		0.4f, 0.5f,
+		9.6f,6.5f,-3.1f,
+		0.3f, 0.2f, 0.1f);
+	pointLightCount++;
+
+
+	pointLights[2] = PointLight(1.0f, 1.0f, 1.0f,
+		0.4f, 0.5f,
+		15.0f, 5.0f, -16.1f,
+		0.3f, 0.2f, 0.1f);
+	pointLightCount++;
+
+
+	spotLights[0] = SpotLight(1.0f, 0.0f, 0.0f,
+		1.0f, 1.0f,
+		-1.1f,1.5f,1.875f,
+		-0.707*cos(-65*toRadians), sin(-65*toRadians), 0.707*cos(-65*toRadians),
 		1.0f, 0.0f, 0.0f,
-		10.0f);
+		25.0f);
+	spotLightCount++;
+	spotLights[1] = SpotLight(0.0f, 1.0f, 0.0f,
+		1.0f, 1.0f,
+		-1.275f, 1.5f, 11.20f,
+		-0.707*cos(-65 * toRadians), sin(-65 * toRadians), -0.707*cos(65*toRadians),
+		1.0f, 0.0f, 0.0f,
+		25.0f);
 	spotLightCount++;
 
+	spotLights[2] = SpotLight(0.0f, 0.0f, 1.0,
+		1.0f, 1.0f,
+		-8.2f, 1.5f, 6.125f,
+		0.2588*cos(-65 * toRadians), sin(-65 * toRadians), 0.9659*cos(-65 * toRadians),
+		1.0f, 0.0f, 0.0f,
+		25.0f);
+	spotLightCount++;
+	
 	// KeyFrames
+
 	KeyFrame[0].x = 42.7f;
 	KeyFrame[0].z = 22.9f;
 	KeyFrame[0].yRot = -90;
@@ -664,7 +841,87 @@ int main()
 	KeyFrame[37].x = 42.7f;
 	KeyFrame[37].z = 22.9f;
 	KeyFrame[37].yRot = -90;
+
+	//KEYFRAME ANIMACION AVATAR
+
+	KeyFrameAv[0].rotBD = 0.0f;
+	KeyFrameAv[0].rotBI = 0.0f;
+	KeyFrameAv[0].rotPSI = 0.0f;
+	KeyFrameAv[0].rotPSD = 0.0f;
+	KeyFrameAv[0].rotPII = 0.0f;
+	KeyFrameAv[0].rotPID = 0.0f;
+
+	rotBD = 0.0f;
+	rotBI = 0.0f;
+	rotPSI = 0.0f;
+	rotPSD = 0.0f;
+	rotPII = 0.0f;
+	rotPID = 0.0f;
+
+	KeyFrameAv[1].rotBD = -20.0f;
+	KeyFrameAv[1].rotBI = 20.0f;
+	KeyFrameAv[1].rotPSI = 00.0f;
+	KeyFrameAv[1].rotPSD = 60.0f;
+	KeyFrameAv[1].rotPII = 0.0f;
+	KeyFrameAv[1].rotPID = 0.0f;
+
+
+	KeyFrameAv[2].rotBD = -20.0f;
+	KeyFrameAv[2].rotBI = 20.0f;
+	KeyFrameAv[2].rotPSI = 00.0f;
+	KeyFrameAv[2].rotPSD = 60.0f;
+	KeyFrameAv[2].rotPII = 0.0f;
+	KeyFrameAv[2].rotPID = 60.0f;
+
 	
+	KeyFrameAv[3].rotBD = -20.0f;
+	KeyFrameAv[3].rotBI = 20.0f;
+	KeyFrameAv[3].rotPSI = -30.0f;
+	KeyFrameAv[3].rotPSD = 30.0f;
+	KeyFrameAv[3].rotPII = -30.0f;
+	KeyFrameAv[3].rotPID = 30.0f;
+
+	KeyFrameAv[4].rotBD = -20.0f;
+	KeyFrameAv[4].rotBI = 20.0f;
+	KeyFrameAv[4].rotPSI = -60.0f;
+	KeyFrameAv[4].rotPSD = 0.0f;
+	KeyFrameAv[4].rotPII = -60.0f;
+	KeyFrameAv[4].rotPID = 0.0f;
+
+	KeyFrameAv[5].rotBD = 20.0f;
+	KeyFrameAv[5].rotBI = -20.0f;
+	KeyFrameAv[5].rotPSI = 60.0f;
+	KeyFrameAv[5].rotPSD = 0.0f;
+	KeyFrameAv[5].rotPII = 0.0f;
+	KeyFrameAv[5].rotPID = 0.0f;
+	
+	KeyFrameAv[6].rotBD = 20.0f;
+	KeyFrameAv[6].rotBI = -20.0f;
+	KeyFrameAv[6].rotPSI = 60.0f;
+	KeyFrameAv[6].rotPSD = 0.0f;
+	KeyFrameAv[6].rotPII = 60.0f;
+	KeyFrameAv[6].rotPID = 0.0f;
+
+
+	KeyFrameAv[7].rotBD = 20.0f;
+	KeyFrameAv[7].rotBI = -20.0f;
+	KeyFrameAv[7].rotPSI = 30.0f;
+	KeyFrameAv[7].rotPSD = -30.0f;
+	KeyFrameAv[7].rotPII = 30.0f;
+	KeyFrameAv[7].rotPID = -30.0f;
+
+	KeyFrameAv[8].rotBD = 20.0f;
+	KeyFrameAv[8].rotBI = -20.0f;
+	KeyFrameAv[8].rotPSI = 0.0f;
+	KeyFrameAv[8].rotPSD = -60.0f;
+	KeyFrameAv[8].rotPII = 0.0f;
+	KeyFrameAv[8].rotPID = -60.0f;
+
+
+	// Interpolacion de valores para la animaciòn del Avatar
+
+	interpolationAvatar();
+
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
@@ -672,11 +929,10 @@ int main()
 
 
 	int hora = 0;
-	double paso = 3;
+	double paso = 2;
 	float t2 = 0,t3 = 0;
-	bool f1 = 1,f2 = 1;
-	bool b1= 1, b2=0, b3=0, b4=0;
-	AjusteModelo ajuste = AjusteModelo(3);
+	bool f1 = 1,f2 = 0,f3 = 0;
+	bool b1= 1, b2=0, b3=0, b4=0,b5 = 1, b6 = 0;
 
 	//Variables para animaciones
 	variablesAnim avionPar = variablesAnim();
@@ -698,7 +954,10 @@ int main()
 	float t = 0.0f;
 	float w = 15, w2 = 20;
 	float avatarRot, avatarFrontX,avatarFrontZ;
-	
+	int rotLlantas = 0;
+	int luces = 0;
+
+	camera.setLastPosition(camera.getCameraPosition());
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
@@ -707,34 +966,42 @@ int main()
 		deltaTime += (now - lastTime) / limitFPS;
 		lastTime = now;
 
-		if (f1) {
-			t = 0.0;
-			f1 = 0;
-		}
-		t += 0.01;
-		if (f2) {
+		
+		if(f1){
 			if (t > paso) {
 				hora++;
-				f1 = 1;
+				t = 0.0;
 			}
-			if (hora > 3)
-				f2 = 0;
-		}
-		else {
-			if (t > paso) {
-				hora--;
-				f1 = 1;
-			}
-			if (hora < 1)
+			if(hora >= 10){
+				f1 = 0;
 				f2 = 1;
+			}
 		}
+		if(f2){
+			if(t > paso){
+				hora--;
+				t = 0.0f;
+			}
+			if(hora <= 0){
+				f2 = 0;
+				f3 = 1;
+			}
+		}
+		if(f3){
+			if(t > 5*paso){
+				f3 = 0;
+				f1 = 1;
+			}
+		}
+		
+		t += 0.01;
+
 		/*printf("Hora: %i\n", hora);*/
 		//Recibir eventos del usuario
 		glfwPollEvents();
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
-		ajuste.ajustar(mainWindow.getsKeys());
 
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -767,13 +1034,46 @@ int main()
 
 
 		//información al shader de fuentes de iluminación
-		shaderList[0].SetDirectionalLight(&mainLight);
-		shaderList[0].SetPointLights(pointLights, pointLightCount);
-		shaderList[0].SetSpotLights(spotLights, spotLightCount);
+		if (hora >= 1 &&  hora < 7)
+			shaderList[0].SetDirectionalLight(&sunsetLight);
+		if (hora >= 7)
+			shaderList[0].SetDirectionalLight(&dayLight);
+		if (hora == 0) {
+			shaderList[0].SetDirectionalLight(&nightLight);
+			shaderList[0].SetPointLights(pointLights, pointLightCount);
+		}
+		else
+			shaderList[0].SetPointLights(pointLights, 0);
+
+
+		if (camera.getShow()) {
+			if (luces <= 30 && b5) {
+				luces++;
+				if (luces == 30) {
+					b5 = 0;
+					b6 = 1;
+				}
+			}
+			else if(luces >= 0 && b6) {
+				luces--;
+				if (luces == 0) {
+					b6 = 0;
+					b5 = 1;
+				}
+			}
+			spotLights[0].SetDir(glm::vec3(-0.707*cos((-65 + luces)* toRadians), sin((-65 + luces) * toRadians), 0.707*cos((-65 + luces) * toRadians)));
+			spotLights[1].SetDir(glm::vec3(-0.707*cos((-65 + luces) * toRadians), sin((-65 + luces) * toRadians), -0.707*cos((-65 + luces) * toRadians)));
+			spotLights[2].SetDir(glm::vec3(0.2588*cos((-65 + luces) * toRadians), sin((-65 + luces) * toRadians), 0.9659*cos((-65 + luces) * toRadians)));
+			shaderList[0].SetSpotLights(spotLights, spotLightCount);
+		}
+		else 
+			shaderList[0].SetSpotLights(spotLights, 0);
 
 
 		glm::mat4 model(1.0);
-		glm::mat4 modelAux(1.0);
+		glm::mat4 modelAuxAv(1.0);
+		glm::mat4 modelAuxAudi(1.0);
+
 
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
@@ -784,10 +1084,12 @@ int main()
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		meshList[0]->RenderMesh();
 
+		animateAvatar(camera.doesItMove());
+
 		//Avatar 
 		model = glm::mat4(1.0);
-		model = glm::translate(model,camera.getCameraPosition() + glm::vec3(0.0f,-1.215f,0.0f));
-		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
+		model = glm::translate(model,camera.getCameraPosition() - camera.getCameraDirection());
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
 		avatarFrontX = camera.getCameraDirection().x;
 		avatarFrontZ = camera.getCameraDirection().z;
 		if (avatarFrontZ != 0)
@@ -795,16 +1097,53 @@ int main()
 		if (avatarFrontZ > 0 )
 			avatarRot += 180 * toRadians;
 		model = glm::rotate(model, avatarRot + 90*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelAuxAv = model;
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		avatar.RenderModel();
+		avatarTorso.RenderModel();
 
 
-		//Casa
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		model = modelAuxAv;
+		model = glm::translate(model, glm::vec3(0.0f, -1.4f*(1 / 0.05), 0.25f*(1 / 0.05)));
+		model = glm::rotate(model,rotPSD *toRadians,glm::vec3(0.0f,0.0f,1.0f));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		casa.RenderModel();
+		avatarPiernaSupDer.RenderModel();
+
+		model = modelAuxAv;
+		model = glm::translate(model, glm::vec3(0.0f, (1 / 0.05)* (-1.4f), (1 / 0.05)*-0.25f));
+		model = glm::rotate(model, rotPSI *toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		avatarPiernaSupIzq.RenderModel();
+
+		//+ 0.55*sin(rotPSD))
+		model = modelAuxAv;
+		model = glm::translate(model, glm::vec3((1 / 0.05)*(0.15f + 0.58*sin(rotPSD*toRadians)) , (1 / 0.05)* (-1.95f + 0.58*(1-cos(rotPSD*toRadians))), (1 / 0.05)*0.3f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		avatarPiernaInf.RenderModel();
+
+		//+ 0.55*sin(rotPSI)
+		model = modelAuxAv;
+		model = glm::translate(model, glm::vec3((0.15f + 0.58* sin(rotPSI*toRadians))*(1 / 0.05) , (-1.95f + 0.58*(1-cos(rotPSI*toRadians)))*(1 / 0.05), -0.25f*(1 / 0.05)));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		avatarPiernaInf.RenderModel();
+
+		model = modelAuxAv;
+		model = glm::translate(model, glm::vec3(-0.05f*(1 / 0.05), -0.35f*(1 / 0.05), 0.25f*(1 / 0.05)));
+		model = glm::rotate(model, rotBD *toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		avatarBrazoDer.RenderModel();
+
+		model = modelAuxAv;
+		model = glm::translate(model, glm::vec3(-0.05f*(1 / 0.05), -0.35f*(1 / 0.05), -0.25f*(1 / 0.05)));
+		model = glm::rotate(model, rotBI *toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		avatarBrazoIzq.RenderModel();
 
 		//Sofa
 		model = glm::mat4(1.0);
@@ -812,6 +1151,7 @@ int main()
 		model = glm::scale(model, glm::vec3(0.21f, 0.21f, 0.21f));
 		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		sofa.RenderModel();
 
 		//Cama 1
@@ -849,8 +1189,8 @@ int main()
 
 		//Escritorio
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(31.46f, 2.72f, 7.18f));
-		model = glm::scale(model, glm::vec3(1.46f, 1.46f, 1.46f));
+		model = glm::translate(model, glm::vec3(31.55f, 2.8f, 7.4f));
+		model = glm::scale(model, glm::vec3(1.88f, 1.88f, 1.88f));
 		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		mesa.RenderModel();
@@ -1039,6 +1379,13 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		lampara2.RenderModel();
 
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-6.9f, 2.8f, 6.2f));
+		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
+		model = glm::rotate(model, -75 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		lampara2.RenderModel();
+
 		//Cajonera
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(35.82f, 2.74f, 3.24f));
@@ -1060,6 +1407,53 @@ int main()
 		model = glm::rotate(model, 197 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		planta2.RenderModel();
+
+		//Luces Show
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-1.3f, 2.2f, 1.9f));
+		model = glm::scale(model, glm::vec3(4.3f, 4.3f, 4.3f));
+		model = glm::rotate(model, 135 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		luzPF.RenderModel();
+		
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-1.3f, 2.2f, 11.0f));
+		model = glm::scale(model, glm::vec3(4.3f, 4.3f, 4.3f));
+		model = glm::rotate(model, 45 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		luzPF.RenderModel();
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-8.0f, 2.2f, 6.2f));
+		model = glm::scale(model, glm::vec3(4.3f, 4.3f, 4.3f));
+		model = glm::rotate(model, -75 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		luzPF.RenderModel();	
+		
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-1.1f, 1.5f, 1.875f));
+		model = glm::scale(model, glm::vec3(4.3f, 4.3f, 4.3f));
+		model = glm::rotate(model, 135 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, luces * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		luzPM.RenderModel();
+		
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-1.275f, 1.5f, 11.2f));
+		model = glm::scale(model, glm::vec3(4.3f, 4.3f, 4.3f));
+		model = glm::rotate(model, 45 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, luces * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		luzPM.RenderModel();
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-8.2f, 1.5f, 6.125f));
+		model = glm::scale(model, glm::vec3(4.3f, 4.3f, 4.3f));
+		model = glm::rotate(model, -75 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model,luces * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		luzPM.RenderModel();
+
 
 		//Ventanas
 
@@ -1090,13 +1484,13 @@ int main()
 		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		ventana.RenderModel();
-
+		///////////////////
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-0.92f, 3.42f, 6.26f));
+		model = glm::translate(model, glm::vec3(-0.5f, 3.42f, 6.26f));
 		model = glm::scale(model, glm::vec3(1.55f, 1.55f, 1.55f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		ventana.RenderModel();
-
+		/////////////////////
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(-23.04f, 3.56f, 7.94f));
 		model = glm::scale(model, glm::vec3(1.595f, 1.595f, 1.595f));
@@ -1138,6 +1532,37 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		cocina.RenderModel();
 
+		//Lamparas exteriores
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(9.6f, 6.75f, -3.4f));
+		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.RenderModel();
+
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-16.65f, 6.75f, 0.9f));
+		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.RenderModel();
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-6.95f, 6.75f, 0.9f));
+		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.RenderModel();
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(28.75f, 6.75f, 1.45));
+		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.RenderModel();
+
+		
 		//Chico RC
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(18.14f, 2.74f, -6.3f));
@@ -1238,11 +1663,28 @@ int main()
 
 		//Audi
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(x, -2.2f, z));
+		model = glm::translate(model, glm::vec3(x, -2.0f, z));
 		model = glm::scale(model, glm::vec3(0.07f, 0.07f, 0.07f));
 		model = glm::rotate(model, (yRot) *toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelAuxAudi = model;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		audi.RenderModel();
+
+		model = modelAuxAudi;
+		model = glm::translate(model, glm::vec3(0.0f, 0.6f*(1 / 0.07), 2.5f*(1 / 0.07)));
+		model = glm::rotate(model, rotLlantas * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		llantas.RenderModel();
+
+		model = modelAuxAudi;
+		model = glm::translate(model, glm::vec3(0.0f, 0.6f*(1 / 0.07), -2.9f*(1 / 0.07)));
+		model = glm::rotate(model, rotLlantas * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		llantas.RenderModel();
+		rotLlantas+=5;
+		if (rotLlantas == 360) {
+			rotLlantas = 0;
+		}
 
 		//Coche de RC
 		model = glm::mat4(1.0);
@@ -1262,36 +1704,115 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		avion.RenderModel();
 
-
-		/*model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(ajuste.getX(), ajuste.getY(), ajuste.getZ()));
-		model = glm::scale(model, glm::vec3(ajuste.getEscala(), ajuste.getEscala(), ajuste.getEscala()));
-		model = glm::rotate(model, ajuste.getRotacion()*toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//Cuadros
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(30.8f, 5.6f, 7.4f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		materialGris.LoadTexture();
-		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		switch (ajuste.getModelo()) {
-		case 0:
-			avatar.RenderModel();
-			break;
-		case 1:
-			ellie.RenderModel();
-			break;
-		case 2:
-			balon.RenderModel();
-			break;
-		default:
-			break;
-		}*/
+		cuadro3.RenderModel();
 
-		if (playIndex == 37) {
-			for (int i = 0; i < 37; i++) {
-				printf("KeyFrameInc[%i]->(%3f,%3f,%3f)\n", i,KeyFrame[i].xInc, KeyFrame[i].zInc, KeyFrame[i].yRotInc);
-			}
-			
-		}
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-3.4f, 5.4f, 1.3f));
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		cuadro1.RenderModel();
+		
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(9.5f, 5.7f, -9.4f));
+		model = glm::scale(model, glm::vec3(0.055f, 0.055f, 0.055f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		cuadro.RenderModel();
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-1.9f, -2.0f, 19.4f));
+		model = glm::scale(model, glm::vec3(0.19f, 0.19f, 0.19f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		arbol.RenderModel();
 
 
+		//Arbol
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-1.9f, -2.0f, 19.4f));
+		model = glm::scale(model, glm::vec3(0.19f, 0.19f, 0.19f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		arbol.RenderModel();
+
+
+		//Casa
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		bosque.UseTexture();
+		casa.RenderModel();
+		glDisable(GL_BLEND);
+
+		// Pinos
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(15.6f, -2.9f, 35.7f));
+		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		pinoHojas.UseTexture();
+		pintoRamas.UseTexture();
+		pino.RenderModel();
+		glDisable(GL_BLEND);
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(31.4f, -2.9f, 36.0f));
+		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		pinoHojas.UseTexture();
+		pintoRamas.UseTexture(); 
+		pino.RenderModel();
+		glDisable(GL_BLEND);
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(61.99f, -2.9f, 36.5f));
+		model = glm::scale(model, glm::vec3(0.023f, 0.023f, 0.023f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		pinoHojas.UseTexture();
+		pintoRamas.UseTexture(); 
+		pino.RenderModel();
+		glDisable(GL_BLEND);
+		
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(5.79f, -2.4f, 37.6f));
+		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		pinoHojas.UseTexture();
+		pintoRamas.UseTexture(); 
+		pino.RenderModel();
+		glDisable(GL_BLEND);
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(23.20f, -2.5f, 37.6f));
+		model = glm::scale(model, glm::vec3(0.025f, 0.025f, 0.025f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		pinoHojas.UseTexture();
+		pintoRamas.UseTexture(); 
+		pino.RenderModel();
+		glDisable(GL_BLEND);
+
+
+		camera.setLastPosition(camera.getCameraPosition());
 
 		glUseProgram(0);
 

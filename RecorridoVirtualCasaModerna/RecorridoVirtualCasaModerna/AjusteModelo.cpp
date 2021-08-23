@@ -13,7 +13,7 @@ AjusteModelo::AjusteModelo(glm::vec3 pos, int maxModelos) {
 	x = pos.x;
 	y = pos.y;
 	z = pos.z;
-	escala = 1.0;
+	escala = 4.3;
 	rotacion = 0.0;
 	modelo = 0;
 	this->maxModelos = maxModelos;
@@ -22,29 +22,29 @@ void AjusteModelo::ajustar(bool* keys) {
 
 	if (keys[GLFW_KEY_K])
 	{
-		x += 0.1;
+		x += 0.05;
 	}
 	if (keys[GLFW_KEY_H])
 	{
-		x -= 0.1;
+		x -= 0.05;
 	}
 
 	if (keys[GLFW_KEY_I])
 	{
-		y +=  0.1;
+		y +=  0.05;
 	}
 
 	if (keys[GLFW_KEY_Y])
 	{
-		y -= 0.1;
+		y -= 0.05;
 	}
 
 	if (keys[GLFW_KEY_U])
 	{
-		z +=  0.1;
+		z +=  0.05;
 	}
 	if (keys[GLFW_KEY_J]) {
-		z -= 0.1 ;
+		z -= 0.05;
 	}
 	if (keys[GLFW_KEY_O]) {
 		escala += 0.005;
@@ -67,10 +67,10 @@ void AjusteModelo::ajustar(bool* keys) {
 			modelo = 0;
 		}
 	}
-	/*printf("Modelo numero= %i\n", modelo);
+	printf("Modelo numero= %i\n", modelo);
 	printf("Desplazamiento: (%f,%f,%f)\n ", x, y, z);
 	printf("Escala: %f\n",escala);
-	printf("Rotacion: %f\n", rotacion);*/
+	printf("Rotacion: %f\n", rotacion);
 }
 
 AjusteModelo::~AjusteModelo() {}

@@ -54,10 +54,10 @@
     <ClCompile Include="Window.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="AjusteModelo.cpp">
+    <ClCompile Include="RecorridoVirtual.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="RecorridoVirtual.cpp">
+    <ClCompile Include="AjusteModelo.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
